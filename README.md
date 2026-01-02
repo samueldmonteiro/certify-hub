@@ -1,75 +1,36 @@
-#### Requisitos Funcionais (RF)
-##### Autenticação e Usuário
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-- [] RF01 – Deve ser possível o administrador se autenticar no sistema.
+## Getting Started
 
-- [] RF02 – Deve ser possível obter o perfil do usuário autenticado.
+First, run the development server:
 
-- [] RF03 – Deve ser possível realizar logout do sistema.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-- [] RF04 – Deve ser possível exibir o painel administrativo após autenticação bem-sucedida.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-##### Gestão de Certificados
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-- [] RF05 – Deve ser possível realizar o upload de uma planilha Excel para geração de certificados.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- [] RF06 – Deve ser possível validar se a planilha enviada contém os campos obrigatórios esperados.
+## Learn More
 
-- [] RF07 – Deve ser possível extrair os dados da planilha enviada.
+To learn more about Next.js, take a look at the following resources:
 
-- [] RF08 – Deve ser possível listar os dados dos alunos extraídos da planilha antes da geração dos certificados.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-- [] RF09 – Deve ser possível gerar certificados automaticamente a partir dos dados da planilha.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-- [] RF10 – Deve ser possível gerar um certificado individual a partir de uma inscrição única de aluno.
+## Deploy on Vercel
 
-- [] RF11 – Deve ser possível preencher automaticamente nome, CPF e demais dados no certificado.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-- [] RF12 – Deve ser possível utilizar um template visual de certificado previamente definido.
-
-- [] RF13 – Deve ser possível gerar um único arquivo PDF contendo todos os certificados gerados.
-
-- [] RF14 – Deve ser possível visualizar ou baixar o PDF gerado.
-
-- [] RF15 – Deve ser possível reutilizar o mesmo template para múltiplas gerações.
-
-#### Requisitos Não Funcionais (RNF)
-##### Segurança
-
-- [] RNF01 – As senhas dos usuários devem ser armazenadas de forma criptografada.
-
-- [] RNF02 – O acesso ao sistema deve ser protegido por sessão ou token seguro (JWT).
-
-- [] RNF03 – Apenas usuários autenticados podem acessar o painel administrativo.
-
-- [] RNF04 – Apenas usuários autenticados podem gerar certificados.
-
-##### Performance e Escalabilidade
-
-- [] RNF05 – O sistema deve processar planilhas com até X alunos sem degradação perceptível de desempenho.
-
-- [] RNF06 – A geração do PDF deve ocorrer em tempo aceitável para o usuário.
-
-- [] RNF07 – O sistema deve lidar corretamente com falhas durante o processamento da planilha ou geração do PDF.
-
-##### Usabilidade
-
-- [] RNF08 – O sistema deve fornecer mensagens claras de erro em caso de planilha inválida.
-
-- [] RNF09 – O sistema deve indicar o progresso da geração dos certificados quando aplicável.
-
-#### Regras de Negócio (RN)
-
-- [] RN01 – Cada certificado deve possuir um número identificador único no formato XXX/AAAA (ex: 015/2026).
-
-- [] RN02 – Cada certificado deve conter a informação da página no formato PP/AAAA (ex: 03/2026).
-
-- [] RN03 – A cada 50 certificados gerados, o número da página deve ser incrementado automaticamente.
-
-- [] RN04 – O ano (AAAA) deve corresponder ao ano corrente no momento da geração.
-
-- [] RN05 – Certificados só podem ser gerados a partir de dados válidos (planilha validada ou inscrição individual).
-
-- [] RN06 – Um certificado não pode ser gerado sem CPF e nome válidos.
-
-- [] RN07 – O template visual do certificado deve ser aplicado de forma consistente em todas as gerações.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
