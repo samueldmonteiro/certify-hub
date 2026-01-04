@@ -8,7 +8,7 @@ const eslintConfig = defineConfig([
 
   {
     rules: {
-      // Identação com 2 espaços
+    // Identação com 2 espaços
       indent: ['error', 2],
 
       // Ponto e vírgula obrigatório
@@ -21,8 +21,12 @@ const eslintConfig = defineConfig([
       'comma-dangle': ['error', 'always-multiline'],
       'object-curly-spacing': ['error', 'always'],
       'array-bracket-spacing': ['error', 'never'],
+
+      // 🔥 CONTROLE DO `any`
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
+
 
   globalIgnores([
     '.next/**',
@@ -31,7 +35,7 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'node_modules/**',
     'coverage/**',
-    'generated/**'
+    'generated/**',
   ]),
 ]);
 
