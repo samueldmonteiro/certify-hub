@@ -1,7 +1,7 @@
 import { User } from '@/src/core/domain/entities/user.entity';
 import { ResourceNotFoundError } from '@/src/core/domain/errors/resource-not-found.error';
 import { IUserRepository } from '@/src/core/domain/repositories/user.repository';
-import { PasswordHasher } from '../../criptography/password-hasher';
+import { PasswordHasher } from '../../../domain/criptography/password-hasher';
 import { InvalidCredentialsError } from '@/src/core/domain/errors/invalid-credentials.error';
 
 export interface LoginUseCaseRequest {

@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
@@ -41,6 +42,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "4.0.16",
+    "@vitest/ui": "4.0.16",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.1.1",
     "prisma": "^7.2.0",
