@@ -1,7 +1,7 @@
 #### Requisitos Funcionais (RF)
 ##### Autenticação e Usuário
 
-- [] RF01 – Deve ser possível o administrador se autenticar no sistema.
+- [x] RF01 – Deve ser possível o administrador se autenticar no sistema.
 
 - [] RF02 – Deve ser possível obter o perfil do usuário autenticado.
 
@@ -36,13 +36,13 @@
 #### Requisitos Não Funcionais (RNF)
 ##### Segurança
 
-- [] RNF01 – As senhas dos usuários devem ser armazenadas de forma criptografada.
+- [x] RNF01 – As senhas dos usuários devem ser armazenadas de forma criptografada.
 
-- [] RNF02 – O acesso ao sistema deve ser protegido por sessão ou token seguro (JWT).
+- [x] RNF02 – O acesso ao sistema deve ser protegido por sessão ou token seguro (JWT).
 
-- [] RNF03 – Apenas usuários autenticados podem acessar o painel administrativo.
+- [x] RNF03 – Apenas usuários autenticados podem acessar o painel administrativo.
 
-- [] RNF04 – Apenas usuários autenticados podem gerar certificados.
+- [x] RNF04 – Apenas usuários autenticados podem gerar certificados.
 
 ##### Performance e Escalabilidade
 
