@@ -21,11 +21,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="pt_BR">
+    <html lang="pt_BR" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -36,9 +36,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster/>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
   );
 }
+

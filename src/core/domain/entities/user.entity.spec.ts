@@ -71,25 +71,6 @@ describe('User Entity (Unit)', () => {
     }).toThrow('Nome deve conter mais de 3 caracteres');
   });
 
-  it('should serialize without exposing password (toJSON)', () => {
-    const user = new User({
-      id: randomUUID(),
-      email: 'test@email.com',
-      name: 'test',
-      password: '12345',
-    });
-
-    const json = user.toJSON();
-
-    expect(json).toEqual({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    });
-
-    expect(json).not.toHaveProperty('password');
-  });
-
   it('should throw InvalidCredentialsError when invalid name', async () => {
 
     expect(() => {

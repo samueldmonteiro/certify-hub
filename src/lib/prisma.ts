@@ -8,5 +8,5 @@ const databaseURL = new URL(connectionString);
 const schema = databaseURL.searchParams.get('schema') ?? 'public';
 
 const adapter = new PrismaPg({ connectionString }, { schema: schema });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({ adapter, log: ['query'] });
 export { prisma };

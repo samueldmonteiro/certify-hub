@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-
 }
 
 model User {
@@ -15,4 +14,19 @@ model User {
   password String
 
   @@map("users")
+}
+
+model Certificate {
+  id                 String   @id @default(uuid())
+  studentName        String
+  courseName         String
+  cpf                String
+  workload           Int
+  completionDate     DateTime
+  page               String
+  registrationNumber String   @unique
+  ptsBook            String
+  createdAt           DateTime @default(now())
+
+  @@map("certificates")
 }

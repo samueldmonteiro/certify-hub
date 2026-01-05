@@ -1,3 +1,5 @@
+import { DomainError } from '../errors/domain.error';
+
 export interface UserProps {
   id: string;
   email: string;
@@ -15,11 +17,11 @@ export class User {
 
   private validateConstructor(props: UserProps) {
     if (!props.name || props.name.trim().length < 3) {
-      throw new Error('Nome deve conter mais de 3 caracteres');
+      throw new DomainError('Nome deve conter mais de 3 caracteres');
     }
 
     if (!props.password || props.password.length < 5) {
-      throw new Error('Senha deve conter mais de 5 caracteres');
+      throw new DomainError('Senha deve conter mais de 5 caracteres');
     }
   }
 
@@ -46,26 +48,16 @@ export class User {
 
   changePassword(newPassword: string): void {
     if (newPassword.length < 5) {
-      throw new Error('Senha deve conter mais de 5 caracteres');
+      throw new DomainError('Senha deve conter mais de 5 caracteres');
     }
     this.props.password = newPassword;
   }
 
   changeName(newName: string): void {
     if (!newName || newName.trim().length < 3) {
-      throw new Error('Nome deve conter mais de 3 caracteres');
+      throw new DomainError('Nome deve conter mais de 3 caracteres');
     }
 
     this.props.name = newName.trim();
-  }
-
-  toJSON(): Record<string, any> {
-    return {
-      id: this.id,
-      email: this.email,
-      name: this.name,
-      // Relacionamentos são incluídos se existirem
-      //...(this.posts && { posts: this.posts.map(p => p.toJSON()) }),
-    };
   }
 }
