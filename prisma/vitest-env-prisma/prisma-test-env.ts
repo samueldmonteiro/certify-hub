@@ -1,12 +1,8 @@
 import { Client } from 'pg';
 import { execSync } from 'node:child_process';
 import type { Environment } from 'vitest/environments';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
-
-dotenv.config({
-  path: '.env.test',
-});
 
 export default <Environment>{
   name: 'prisma',
@@ -31,7 +27,7 @@ export default <Environment>{
     return {
       async teardown() {
         const client = new Client({
-          connectionString: process.env.DATABASE_URL?.split('?')[0], // URL sem o schema param
+          connectionString: process.env.DATABASE_URL?.split('?')[0],
           connectionTimeoutMillis: 3000,
         });
 

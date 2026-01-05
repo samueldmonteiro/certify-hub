@@ -38,7 +38,7 @@ beforeEach(() => {
 
 describe('Login User UseCase (Unit)', async () => {
 
-  it('should return a token and user on successful login', async () => {
+  it('should return user on successful login', async () => {
     userRepoMock.findByEmail.mockResolvedValue(genericUser);
     passwordHasher.compare.mockResolvedValue(true);
 

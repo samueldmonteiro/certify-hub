@@ -9,21 +9,21 @@ export default defineConfig({
   },
 
   test: {
-    dir: '/',
+    dir: '/src',
     projects: [
       {
         extends: true,
         test: {
           name: 'unit',
-          dir: 'src/core/application/',
+          dir: 'src/core/',
         },
       },
 
       {
         extends: true,
         test: {
-          name: 'e2e',
-          dir: 'tests/e2e',
+          name: 'int',
+          dir: 'src/tests/integration',
           environment: './prisma/vitest-env-prisma/prisma-test-env.ts',
         },
       },

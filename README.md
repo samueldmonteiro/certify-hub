@@ -89,17 +89,6 @@ Testes são tratados como **parte essencial do projeto**, não como um detalhe o
 - **Prisma** – Banco isolado para testes
 - **PostgreSQL** - Uso de schemas isolados para os testes.
 
-
-#### 1️⃣ Arquivo de variáveis de ambiente
-
-Crie um arquivo `.env.test` com base no `.env.test.example`.
-
-~~~env
-NODE_ENV=test
-
-DATABASE_URL="postgresql://user:password@localhost:5432/database?schema=tests"
-~~~
-
 ---
 
 ### ▶️ Rodando os Testes
@@ -122,7 +111,7 @@ pnpm test:watch
 pnpm test:coverage
 ~~~
 
-#### Testes por tipo (unit, integration, e2e)
+#### Testes por tipo (unit, int, e2e)
 
 ~~~bash
 pnpm test --project unit

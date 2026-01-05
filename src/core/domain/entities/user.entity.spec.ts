@@ -15,6 +15,7 @@ describe('User Entity (Unit)', () => {
     expect(user.id).toBeDefined();
     expect(user.email).toBe('test@email.com');
     expect(user.name).toBe('test');
+    expect(user.getPassword()).toBe('12345');
   });
 
   it('should change password', () => {
@@ -89,20 +90,27 @@ describe('User Entity (Unit)', () => {
     expect(json).not.toHaveProperty('password');
   });
 
-  it('should return safe public response (toResponse)', () => {
-    const user = new User({
-      id: randomUUID(),
-      email: 'test@email.com',
-      name: 'test',
-      password: '12345',
-    });
+  it('should throw InvalidCredentialsError when invalid name', async () => {
 
-    const response = user.toResponse();
+    expect(() => {
+      new User({
+        id: randomUUID(),
+        email: 'test@email.com',
+        name: 't',
+        password: '123456',
+      });
+    }).toThrow('Nome deve conter mais de 3 caracteres');
+  });
 
-    expect(response).toEqual({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    });
+  it('should throw InvalidCredentialsError when invalid password', async () => {
+
+    expect(() => {
+      new User({
+        id: randomUUID(),
+        email: 'test@email.com',
+        name: 'test',
+        password: '12',
+      });
+    }).toThrow('Senha deve conter mais de 5 caracteres');
   });
 });

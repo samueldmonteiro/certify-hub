@@ -68,13 +68,4 @@ export class User {
       //...(this.posts && { posts: this.posts.map(p => p.toJSON()) }),
     };
   }
-
-  // Serialização para resposta pública (ainda mais restrito)
-  toResponse(): Record<string, any> {
-    return {
-      id: this.id,
-      email: this.email,
-      name: this.name,
-    };
-  }
 }
