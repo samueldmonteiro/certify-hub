@@ -37,6 +37,5 @@ export class LoginUseCase {
     return {
       user: userExists,
     };
-
   }
 }
