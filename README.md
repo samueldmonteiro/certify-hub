@@ -21,7 +21,7 @@ O projeto utiliza **Next.js**, **TypeScript** e **Prisma**, com o back-end estru
 - **Prisma ORM** – Acesso ao banco de dados
 - **PostgreSQL** – Banco de dados relacional
 - **Docker & Docker Compose** – Padronização de ambiente
-- **Vitest** – Testes unitários e de integração
+- **Vitest** – Testes
 - **Clean Architecture** – Organização do back-end
 
 ---
