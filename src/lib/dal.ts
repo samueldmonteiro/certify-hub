@@ -5,6 +5,7 @@ import { decrypt } from '@/src/lib/session';
 import { cache } from 'react';
 import { prisma } from './prisma';
 import { redirect } from 'next/navigation';
+import { User } from '../core/domain/entities/user.entity';
  
 export const verifySession = cache(async () => {
   const cookie = (await cookies()).get('session')?.value;
@@ -22,9 +23,9 @@ export const getUser = cache(async () => {
   if (!session) return null;
  
   try {
-    const user = await prisma.user.findUnique({ where: { id : String(session.userId) } });
- 
-    return user;
+    const user = await prisma.user.findUniqueOrThrow({ where: { id : String(session.userId) } });
+
+    return new User(user);
   } catch {
     console.log('Failed to fetch user');
     return null;

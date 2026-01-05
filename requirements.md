@@ -3,11 +3,11 @@
 
 - [x] RF01 – Deve ser possível o administrador se autenticar no sistema.
 
-- [] RF02 – Deve ser possível obter o perfil do usuário autenticado.
+- [x] RF02 – Deve ser possível obter o perfil do usuário autenticado.
 
-- [] RF03 – Deve ser possível realizar logout do sistema.
+- [x] RF03 – Deve ser possível realizar logout do sistema.
 
-- [] RF04 – Deve ser possível exibir o painel administrativo após autenticação bem-sucedida.
+- [x] RF04 – Deve ser possível exibir o painel administrativo após autenticação bem-sucedida.
 
 ##### Gestão de Certificados
 
