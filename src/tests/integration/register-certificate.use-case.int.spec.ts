@@ -3,7 +3,6 @@ import { Certificate } from '@/src/core/domain/entities/certificate.entity';
 import { PrismaCertificateRepository } from '@/src/core/infra/database/prisma/prisma-certificate.repository';
 import { RegisterCertificateUseCase } from '@/src/core/application/use-cases/certificate/register-certificate.use-case';
 
-
 let sut: RegisterCertificateUseCase;
 
 beforeEach(() => {
@@ -24,6 +23,7 @@ describe('RegisterCertificateUseCase (Unit)', () => {
       completionDate: new Date('2025-01-01'),
       page: '001/2026',
       registrationNumber: '0001/2026',
+      fileURL: 'file-url-test.com',
     });
 
     expect(response.certificate).toBeInstanceOf(Certificate);

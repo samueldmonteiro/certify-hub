@@ -4,5 +4,6 @@ packages:
 ignoredBuiltDependencies:
   - '@prisma/engines'
   - prisma
+  - puppeteer
   - sharp
   - unrs-resolver

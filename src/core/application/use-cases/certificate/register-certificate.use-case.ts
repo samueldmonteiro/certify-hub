@@ -14,6 +14,7 @@ export interface RegisterCertificateRequest {
   completionDate: Date,
   page: string,
   registrationNumber: string,
+  fileURL?: string
 }
 
 export interface RegisterCertificateResponse {
@@ -41,9 +42,13 @@ export class RegisterCertificateUseCase {
       cpf: new CPF(request.cpf),
       ptsBook: new PTSBook('001/2026'),
       workload: request.workload,
+      fileURL: request.fileURL,
     });
 
     const newCert = await this.certificateRepo.create(certificate);
-    return { certificate: newCert };
+
+    return { 
+      certificate: newCert,
+    };
   }
 }

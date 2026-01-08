@@ -8,11 +8,15 @@ const certificateRepositoryMock: Mocked<ICertificateRepository> = {
   findById: vi.fn(),
 };
 
+
 let sut: RegisterCertificateUseCase;
 
 beforeEach(() => {
   certificateRepositoryMock.create.mockReset();
-  sut = new RegisterCertificateUseCase(certificateRepositoryMock);
+
+  sut = new RegisterCertificateUseCase(
+    certificateRepositoryMock,
+  );
 });
 
 describe('RegisterCertificateUseCase (Unit)', () => {
@@ -22,6 +26,7 @@ describe('RegisterCertificateUseCase (Unit)', () => {
       async (certificate: Certificate) => certificate,
     );
 
+
     const response = await sut.execute({
       studentName: 'Test Student',
       courseName: 'Course test',
@@ -30,6 +35,7 @@ describe('RegisterCertificateUseCase (Unit)', () => {
       completionDate: new Date('2025-01-01'),
       page: '001/2026',
       registrationNumber: '0001/2026',
+      fileURL: 'file-url-test.com',
     });
 
     expect(certificateRepositoryMock.create).toHaveBeenCalledTimes(1);

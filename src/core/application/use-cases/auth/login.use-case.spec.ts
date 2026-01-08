@@ -1,6 +1,6 @@
 import { IUserRepository } from '@/src/core/domain/repositories/user.repository';
 import { describe, vi, it, expect, Mocked, beforeEach } from 'vitest';
-import { PasswordHasher } from '../../../domain/criptography/password-hasher';
+import { PasswordHasher } from '../../../domain/services/password-hasher';
 import { LoginUseCase } from './login.use-case';
 import { User } from '@/src/core/domain/entities/user.entity';
 import { randomUUID } from 'node:crypto';

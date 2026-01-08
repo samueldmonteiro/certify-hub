@@ -26,7 +26,8 @@ model Certificate {
   page               String
   registrationNumber String   @unique
   ptsBook            String
-  createdAt           DateTime @default(now())
+  fileURL            String
+  createdAt          DateTime @default(now())
 
   @@map("certificates")
 }

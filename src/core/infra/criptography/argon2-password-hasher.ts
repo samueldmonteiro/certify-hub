@@ -1,4 +1,4 @@
-import { PasswordHasher } from '../../domain/criptography/password-hasher';
+import { PasswordHasher } from '../../domain/services/password-hasher';
 import argon2 from 'argon2';
 
 export class Argon2PasswordHasher implements PasswordHasher {

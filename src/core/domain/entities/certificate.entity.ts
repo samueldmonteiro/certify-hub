@@ -14,7 +14,8 @@ export interface CertificateProps {
   page: CertificatePage,
   registrationNumber: RegistrationNumber,
   ptsBook: PTSBook,
-  createdAt: Date
+  createdAt: Date,
+  fileURL?: string
 }
 
 export class Certificate {
@@ -77,6 +78,10 @@ export class Certificate {
 
   get createdAt(): Date {
     return this.props.createdAt;
+  }
+
+  get fileURL(): string|undefined {
+    return this.props.fileURL;
   }
 
   changeStudentName(newName: string): void {

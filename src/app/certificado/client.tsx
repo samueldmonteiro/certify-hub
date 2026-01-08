@@ -1,16 +1,17 @@
 'use client';
 
-interface CertificateProps {
+interface CertifyTemplateProps {
   studentName: string;
   cpf: string;
   courseName: string;
-  date: string;
+  date: Date;
   hours: number;
+  logoSrc: string;
+  seloSrc: string;
 }
 
 import Image from 'next/image';
-import logo from '../assets/logo.png';
-import selo from '../assets/selo.png';
+
 
 export function CertifyTemplate({
   studentName,
@@ -18,7 +19,9 @@ export function CertifyTemplate({
   courseName,
   date,
   hours,
-}: CertificateProps) {
+  logoSrc,
+  seloSrc,
+}: CertifyTemplateProps) {
   return (
     <html>
       <head>
@@ -235,7 +238,7 @@ export function CertifyTemplate({
           </svg>
 
           {/* LOGO PRESERVAR */}
-          <Image src={logo} className="logo" alt="Logo Preservar" />
+          <img src={logoSrc} className="logo" alt="Logo Preservar" />
 
           {/* CONTEÚDO PRINCIPAL */}
           <div className="content">
@@ -250,7 +253,7 @@ export function CertifyTemplate({
                 que sob o CPF: <strong>{cpf}</strong>, participou com êxito do Treinamento
               </p>
               <p>
-                de <strong>{courseName}</strong>, realizado no dia <strong>{date}</strong>, com
+                de <strong>{courseName}</strong>, realizado no dia <strong>{date.toString()}</strong>, com
               </p>
               <p>
                 carga horária de <strong>{hours}h</strong>, conforme <strong>NR</strong>
@@ -265,7 +268,7 @@ export function CertifyTemplate({
           <div className="footer">
 
             <div className="signature">
-              <Image src={selo} className="seal" alt="Selo Best Quality" />
+              <img src={seloSrc} className="seal" alt="Selo Best Quality" />
 
               <div>
                 <div className="line" />

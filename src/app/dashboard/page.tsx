@@ -2,9 +2,7 @@ import { AppSidebar } from '@/src/app/_components/app-sidebar';
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/src/app/_components/ui/breadcrumb';
 import { Separator } from '@/src/app/_components/ui/separator';
@@ -16,6 +14,7 @@ import {
 import { getUserAuthenticated } from '@/src/lib/dal';
 import { redirect } from 'next/navigation';
 import { ModeToggle } from '../_components/mode-toggle';
+import Link from 'next/link';
 
 export default async function Page() {
 
@@ -38,15 +37,16 @@ export default async function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
+                  <Link href='/dashboard'>
+                    <BreadcrumbList >
+                      Painel Administrativo
+                    </BreadcrumbList>
+                  </Link>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                   <div className='absolute right-5'>
-                    <ModeToggle/>
+                    <ModeToggle />
                   </div>
                 </BreadcrumbItem>
               </BreadcrumbList>
