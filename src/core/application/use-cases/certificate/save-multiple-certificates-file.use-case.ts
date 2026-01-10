@@ -14,14 +14,17 @@ export class SaveMultipleCertificatesFileUseCase {
 
   async execute(draftCertificates: CertificateDraft[]): Promise<SaveMultipleCertificatesFileResponse> {
 
+    const newCerts: CertificateDraft[] = [];
+
     for (const certData of draftCertificates) {
       const buffer = await this.fileGenerator.generate(certData);
       const fileURL = await this.storageFile.storage(buffer);
       certData.fileUrl = fileURL;
+      newCerts.push(certData);
     };
 
     return {
-      draftCertificates,
+      draftCertificates: newCerts,
     };
   }
 }

@@ -80,7 +80,7 @@ export class Certificate {
     return this.props.createdAt;
   }
 
-  get fileURL(): string|undefined {
+  get fileURL(): string | undefined {
     return this.props.fileURL;
   }
 
