@@ -45,11 +45,11 @@ export const data = {
   ],
 
   navSecondary: [
-    {
+  /**   {
       title: 'Configurações',
       url: '/dashboard/configuracoes',
       icon: Settings,
-    },
+    },**/
   ],
 };
 

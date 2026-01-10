@@ -140,7 +140,7 @@ function GeneratingOverlay({ isGenerating, progress }: { isGenerating: boolean; 
 
 export default function CertificadosPage() {
   const [students, setStudents] = useState<CertificateDraft[]>([]);
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<CertificateDraft[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -152,7 +152,7 @@ export default function CertificadosPage() {
     setSelectedStudents([]);
   };
 
-  const handleSelectionChange = (selected: string[]) => {
+  const handleSelectionChange = (selected: CertificateDraft[]) => {
     setSelectedStudents(selected);
   };
 
@@ -180,7 +180,7 @@ export default function CertificadosPage() {
     setProgress(0);
 
     const dataRequest: any[] = [];
-    students.forEach(d => {
+    selectedStudents.forEach(d => {
       dataRequest.push({
         studentName: d.studentName,
         courseName: d.courseName,

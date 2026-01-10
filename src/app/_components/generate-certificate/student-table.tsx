@@ -15,8 +15,8 @@ import { formatDateToPTBR } from '@/src/lib/utils';
 
 interface StudentTableProps {
   students: CertificateDraft[];
-  selectedStudents: string[];
-  onSelectionChange: (selected: string[]) => void;
+  selectedStudents: CertificateDraft[];
+  onSelectionChange: (selected: CertificateDraft[]) => void;
 }
 
 export default function StudentTable({
@@ -24,19 +24,35 @@ export default function StudentTable({
   selectedStudents,
   onSelectionChange,
 }: StudentTableProps) {
+  // Criar um identificador único para cada aluno (nome + CPF)
+  const getStudentId = (student: CertificateDraft) => {
+    return `${student.studentName}-${student.cpf.getValue()}`;
+  };
+
+  // Verificar se um aluno específico está selecionado
+  const isStudentSelected = (student: CertificateDraft) => {
+    return selectedStudents.some(
+      selected => getStudentId(selected) === getStudentId(student),
+    );
+  };
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      onSelectionChange(students.map(s => s.studentName));
+      onSelectionChange([...students]);
     } else {
       onSelectionChange([]);
     }
   };
 
-  const handleSelectOne = (id: string, checked: boolean) => {
+  const handleSelectOne = (student: CertificateDraft, checked: boolean) => {
     if (checked) {
-      onSelectionChange([...selectedStudents, id]);
+      onSelectionChange([...selectedStudents, student]);
     } else {
-      onSelectionChange(selectedStudents.filter(sid => sid !== id));
+      onSelectionChange(
+        selectedStudents.filter(
+          selected => getStudentId(selected) !== getStudentId(student),
+        ),
+      );
     }
   };
 
@@ -68,12 +84,12 @@ export default function StudentTable({
             </TableHeader>
             <TableBody>
               {students.map((student) => (
-                <TableRow key={student.studentName}>
+                <TableRow key={getStudentId(student)}>
                   <TableCell>
                     <Checkbox
-                      checked={selectedStudents.includes(student.studentName)}
+                      checked={isStudentSelected(student)}
                       onCheckedChange={(checked) =>
-                        handleSelectOne(student.studentName, checked as boolean)
+                        handleSelectOne(student, checked as boolean)
                       }
                       aria-label={`Selecionar ${student.studentName}`}
                     />
