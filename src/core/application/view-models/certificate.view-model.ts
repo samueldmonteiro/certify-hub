@@ -9,4 +9,5 @@ export type CertificateViewModel = {
   registrationNumber: string,
   ptsBook: string,
   createdAt: Date
+  fileURL?: string
 };

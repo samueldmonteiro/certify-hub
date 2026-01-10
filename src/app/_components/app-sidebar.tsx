@@ -28,9 +28,14 @@ export const data = {
   navMain: [
     {
       title: 'Emitir Certificado',
-      url: '/dashboard/certificados/emitir',
       icon: FilePlus,
       isActive: true,
+      items: [
+        {
+          title: 'Curso - Brigada de Incêndio e Emergência',
+          url: '/dashboard/certificados/emitir',
+        },
+      ],
     },
     {
       title: 'Certificados Emitidos',

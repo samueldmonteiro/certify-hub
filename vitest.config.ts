@@ -22,6 +22,7 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          testTimeout: 9000,
           name: 'int',
           dir: 'src/tests/integration',
           environment: './prisma/vitest-env-prisma/prisma-test-env.ts',

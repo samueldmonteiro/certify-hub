@@ -1,15 +1,14 @@
-import { Certificate } from '../../domain/entities/certificate.entity';
 import { FileCertificateGenerator } from '../../domain/services/file-certificate-generator';
 import { chromium } from 'playwright';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { FailFileCertificateGeneratorError } from '../../domain/errors/fail-file-certificate-generate.error';
-import { CertifyTemplate } from '@/src/app/certificado/client';
+import { generateCertificateHTML } from '@/src/app/certificado/client';
 import path from 'path';
 import fs from 'fs';
+import { CertificateDraft } from '../../domain/value-objects/certificate-draft.value-object';
 
 export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerator {
 
-  async generate(data: Certificate): Promise<Buffer> {
+  async generate(data: CertificateDraft): Promise<Buffer> {
 
     try {
       const logoBuffer = fs.readFileSync(path.join(process.cwd(), 'src/app/assets/logo.png'));
@@ -18,18 +17,16 @@ export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerat
       const logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
       const seloBase64 = `data:image/png;base64,${seloBuffer.toString('base64')}`;
 
-      const html = renderToStaticMarkup(
-        <CertifyTemplate
-          courseName={data.courseName}
-          cpf={data.cpf.getValue()}
-          date={data.completionDate}
-          hours={data.workload}
-          studentName={data.studentName}
-          logoSrc={logoBase64}
-          seloSrc={seloBase64}
-        />,
-      );
-
+      const html = generateCertificateHTML({
+        courseName: data.courseName,
+        cpf: data.cpf.getValue(),
+        date: data.completionDate,
+        hours: data.workload,
+        logoSrc: logoBase64,
+        seloSrc: seloBase64,
+        studentName: data.studentName,
+      });
+  
       const browser = await chromium.launch();
       const page = await browser.newPage();
 

@@ -1,16 +1,15 @@
-import { Certificate } from '../../domain/entities/certificate.entity';
 import { FileCertificateGenerator } from '../../domain/services/file-certificate-generator';
 import puppeteer from 'puppeteer';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { FailFileCertificateGeneratorError } from '../../domain/errors/fail-file-certificate-generate.error';
-import { CertifyTemplate } from '@/src/app/certificado/client';
+import { generateCertificateHTML } from '@/src/app/certificado/client';
 import fs from 'fs';
 import path from 'path';
+import { CertificateDraft } from '../../domain/value-objects/certificate-draft.value-object';
 
 export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerator {
-  async generate(data: Certificate): Promise<Buffer> {
+  async generate(data: CertificateDraft): Promise<Buffer> {
     let browser;
-    
+
     try {
       // Carregar imagens como base64
       const logoBuffer = fs.readFileSync(
@@ -24,17 +23,15 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
       const seloBase64 = `data:image/png;base64,${seloBuffer.toString('base64')}`;
 
       // Renderizar o HTML
-      const html = renderToStaticMarkup(
-        <CertifyTemplate
-          courseName={data.courseName}
-          cpf={data.cpf.getValue()}
-          date={data.completionDate}
-          hours={data.workload}
-          studentName={data.studentName}
-          logoSrc={logoBase64}
-          seloSrc={seloBase64}
-        />,
-      );
+      const html = generateCertificateHTML({
+        courseName: data.courseName,
+        cpf: data.cpf.getValue(),
+        date: data.completionDate,
+        hours: data.workload,
+        logoSrc: logoBase64,
+        seloSrc: seloBase64,
+        studentName: data.studentName,
+      });
 
       // Lançar navegador
       browser = await puppeteer.launch({
@@ -57,7 +54,7 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
         preferCSSPageSize: true,
       });
 
-     
+
       return Buffer.from(pdf);
     } catch (error: any) {
       throw new FailFileCertificateGeneratorError(

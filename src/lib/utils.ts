@@ -14,3 +14,16 @@ export function getCutName(fullname: string) {
 
   return cutName.join('');
 }
+
+export const formatDateToPTBR = (date: Date)=>{
+  
+  const opcoes: Intl.DateTimeFormatOptions = {
+    day: '2-digit', // Para garantir dois dígitos (ex: 01)
+    month: '2-digit', // Para garantir dois dígitos (ex: 01)
+    year: 'numeric', // Para o ano completo (ex: 2026)
+  };
+
+  // 'pt-BR' garante o formato dia/mês/ano
+  return date.toLocaleDateString('pt-BR', opcoes);
+};
+

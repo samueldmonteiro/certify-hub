@@ -14,6 +14,10 @@ export class CertificatePresenter {
       studentName: cert.studentName,
       workload: cert.workload,
       createdAt: cert.createdAt,
+      fileURL: cert.fileURL,
     };
+  }
+  static toManyViewModel(certs: Certificate[]){
+    return certs.map(cert=> this.toViewModel(cert));
   }
 }

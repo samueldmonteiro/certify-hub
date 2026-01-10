@@ -46,6 +46,7 @@ export class CertificateMapper {
       ptsBook: certificate.ptsBook.getValue(),
       studentName: certificate.studentName,
       workload: certificate.workload,
+      fileURL: certificate.fileURL ?? null,
     };
   }
 
