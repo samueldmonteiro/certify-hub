@@ -40,7 +40,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
 
-  const handleLogout = async()=>{
+  const handleLogout = async () => {
     await logoutAction();
   };
 
@@ -82,14 +82,14 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-       
-            <DropdownMenuGroup>
+            {/** <DropdownMenuSeparator />
+
+         <DropdownMenuGroup>
               <DropdownMenuItem className='cursor-pointer'>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
-            </DropdownMenuGroup>
+            </DropdownMenuGroup>**/}
             <DropdownMenuSeparator />
             <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
               <LogOut />
