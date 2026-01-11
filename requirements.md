@@ -11,27 +11,27 @@
 
 ##### Gestão de Certificados
 
-- [] RF05 – Deve ser possível realizar o upload de uma planilha Excel para geração de certificados.
+- [x] RF05 – Deve ser possível realizar o upload de uma planilha Excel para geração de certificados.
 
-- [] RF06 – Deve ser possível validar se a planilha enviada contém os campos obrigatórios esperados.
+- [x] RF06 – Deve ser possível validar se a planilha enviada contém os campos obrigatórios esperados.
 
-- [] RF07 – Deve ser possível extrair os dados da planilha enviada.
+- [x] RF07 – Deve ser possível extrair os dados da planilha enviada.
 
-- [] RF08 – Deve ser possível listar os dados dos alunos extraídos da planilha antes da geração dos certificados.
+- [x] RF08 – Deve ser possível listar os dados dos alunos extraídos da planilha antes da geração dos certificados.
 
-- [] RF09 – Deve ser possível gerar certificados automaticamente a partir dos dados da planilha.
+- [x] RF09 – Deve ser possível gerar certificados automaticamente a partir dos dados da planilha.
 
 - [] RF10 – Deve ser possível gerar um certificado individual a partir de uma inscrição única de aluno.
 
-- [] RF11 – Deve ser possível preencher automaticamente nome, CPF e demais dados no certificado.
+- [x] RF11 – Deve ser possível preencher automaticamente nome, CPF e demais dados no certificado.
 
-- [] RF12 – Deve ser possível utilizar um template visual de certificado previamente definido.
+- [x] RF12 – Deve ser possível utilizar um template visual de certificado previamente definido.
 
-- [] RF13 – Deve ser possível gerar um único arquivo PDF contendo todos os certificados gerados.
+- [x] RF13 – Deve ser possível gerar um único arquivo PDF contendo todos os certificados gerados.
 
-- [] RF14 – Deve ser possível visualizar ou baixar o PDF gerado.
+- [x] RF14 – Deve ser possível visualizar ou baixar o PDF gerado.
 
-- [] RF15 – Deve ser possível reutilizar o mesmo template para múltiplas gerações.
+- [x] RF15 – Deve ser possível reutilizar o mesmo template para múltiplas gerações.
 
 #### Requisitos Não Funcionais (RNF)
 ##### Segurança
@@ -46,11 +46,11 @@
 
 ##### Performance e Escalabilidade
 
-- [] RNF05 – O sistema deve processar planilhas com até X alunos sem degradação perceptível de desempenho.
+- [x] RNF05 – O sistema deve processar planilhas com até X alunos sem degradação perceptível de desempenho.
 
-- [] RNF06 – A geração do PDF deve ocorrer em tempo aceitável para o usuário.
+- [x] RNF06 – A geração do PDF deve ocorrer em tempo aceitável para o usuário.
 
-- [] RNF07 – O sistema deve lidar corretamente com falhas durante o processamento da planilha ou geração do PDF.
+- [x] RNF07 – O sistema deve lidar corretamente com falhas durante o processamento da planilha ou geração do PDF.
 
 ##### Usabilidade
 
