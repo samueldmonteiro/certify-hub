@@ -1,5 +1,5 @@
 import { CertificatePresenter } from '@/src/core/application/presenters/certificate.presenter';
-import { Certificate } from '@/src/core/domain/entities/certificate.entity';
+import { CertificateViewModel } from '@/src/core/application/view-models/certificate.view-model';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
 import { makeRegisterMultipleCertificatesUseCase } from '@/src/core/infra/factories/make-register-multiple-certificates.use-case.factory';
@@ -10,7 +10,7 @@ import z from 'zod';
 
 export interface GenerateCertificatesResponse {
   success: boolean,
-  data?: Certificate[],
+  data?: CertificateViewModel[],
   errors?: CertificateDraftErrorsSchema
   message?: string
 }

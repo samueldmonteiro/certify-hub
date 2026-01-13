@@ -109,6 +109,9 @@ export function generateCertificateHTML(data: CertificateData): string {
         font-size: 15px;
         line-height: 1.9;
         padding: 0 60mm;
+        width: 1000px;
+        margin: 0 auto;
+        margin-top: -40px;
       }
 
       .description strong {
@@ -235,16 +238,14 @@ export function generateCertificateHTML(data: CertificateData): string {
 
         <div class="description">
           <p>
-            que sob o CPF: <strong>${cpf}</strong>, participou com êxito do Treinamento
-          </p>
-          <p>
-            de <strong>${courseName}</strong>, realizado no dia <strong>${date.toLocaleDateString('pt-BR')}</strong>, com
-          </p>
-          <p>
+            que sob o CPF: <strong>${cpf}</strong>, participou do treinamento
+          
+          
+            de <strong>${courseName}</strong>, no dia <strong>${date.toLocaleDateString('pt-BR')}</strong>, com
+          
             carga horária de <strong>${hours}h</strong>, conforme <strong>NR</strong>
-          </p>
-          <p>
-            <strong>23, NBR 14276, NBR 13434</strong> e <strong>IT - 17 do CBMMA</strong>.
+          
+           <strong>NR 23, NBR 14.276/2020 e NT-17 CBMMA</strong>, tendo seu o aproveitamento satisfatório.
           </p>
         </div>
       </div>

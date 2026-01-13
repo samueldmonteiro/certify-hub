@@ -6,8 +6,8 @@ import { Certificate } from '@/src/core/domain/entities/certificate.entity';
 const certificateRepositoryMock: Mocked<ICertificateRepository> = {
   create: vi.fn(),
   findById: vi.fn(),
+  search: vi.fn(),
 };
-
 
 let sut: RegisterCertificateUseCase;
 
@@ -25,7 +25,6 @@ describe('RegisterCertificateUseCase (Unit)', () => {
     certificateRepositoryMock.create.mockImplementation(
       async (certificate: Certificate) => certificate,
     );
-
 
     const response = await sut.execute({
       studentName: 'Test Student',
