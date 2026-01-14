@@ -19,6 +19,7 @@ export default async function Page(){
     logoSrc: logoBase64,
     seloSrc: seloBase64,
   });
+
   return (
     <>
       <div style={{ height: '100vh', background: '#ccc' }}>
