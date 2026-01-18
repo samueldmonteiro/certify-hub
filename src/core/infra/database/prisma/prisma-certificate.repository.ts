@@ -9,6 +9,16 @@ import { CertificateMapper } from './mappers/certificate.mapper';
 import { CertificateWhereInput } from '@/generated/prisma/models';
 
 export class PrismaCertificateRepository implements ICertificateRepository {
+
+  async lastCreated(): Promise<Certificate | null> {
+    const lastCert = await prisma.certificate.findFirst({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!lastCert) return null;
+    return CertificateMapper.toDomain(lastCert);
+  }
+
   async findById(id: string): Promise<Certificate | null> {
     const data = await prisma.certificate.findUnique({ where: { id } });
     if (!data) return null;
@@ -33,17 +43,19 @@ export class PrismaCertificateRepository implements ICertificateRepository {
     } = params;
 
     const where: CertificateWhereInput = {
-      ...(studentName &&{
+      ...(studentName && {
         studentName: {
           contains: studentName,
           mode: 'insensitive',
-        } }),
+        },
+      }),
 
-      ...(courseName &&{
+      ...(courseName && {
         courseName: {
           contains: courseName,
           mode: 'insensitive',
-        } }),
+        },
+      }),
 
       ...(cpf && { cpf }),
     };

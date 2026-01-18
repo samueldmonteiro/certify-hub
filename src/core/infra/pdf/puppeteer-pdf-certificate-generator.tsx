@@ -4,10 +4,10 @@ import { FailFileCertificateGeneratorError } from '../../domain/errors/fail-file
 import { generateCertificateHTML } from '@/src/app/certificado/client';
 import fs from 'fs';
 import path from 'path';
-import { CertificateDraft } from '../../domain/value-objects/certificate-draft.value-object';
+import { Certificate } from '../../domain/entities/certificate.entity';
 
 export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerator {
-  async generate(data: CertificateDraft): Promise<Buffer> {
+  async generate(data: Certificate): Promise<Buffer> {
     let browser;
 
     try {
@@ -31,6 +31,9 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
         logoSrc: logoBase64,
         seloSrc: seloBase64,
         studentName: data.studentName,
+        registrationNumber: data?.registrationNumber?.getValue() ?? '0001/2026',
+        page: data?.page?.getValue() ?? '001/2026',
+        ptsBook: data?.ptsBook?.getValue() ?? '001/2026',
       });
 
       // Lançar navegador

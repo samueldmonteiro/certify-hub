@@ -6,5 +6,4 @@ export interface CertificateDraft {
   completionDate: Date;
   courseName: string;
   workload: number;
-  fileUrl?: string;
 }

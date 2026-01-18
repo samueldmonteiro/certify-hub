@@ -17,7 +17,8 @@ export class CertificatePresenter {
       fileURL: cert.fileURL,
     };
   }
-  static toManyViewModel(certs: Certificate[]){
-    return certs.map(cert=> this.toViewModel(cert));
+
+  static toManyViewModel(certs: Certificate[]) {
+    return certs.map(cert => this.toViewModel(cert));
   }
 }

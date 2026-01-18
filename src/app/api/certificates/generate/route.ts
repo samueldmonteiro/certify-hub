@@ -2,8 +2,7 @@ import { CertificatePresenter } from '@/src/core/application/presenters/certific
 import { CertificateViewModel } from '@/src/core/application/view-models/certificate.view-model';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
-import { makeRegisterMultipleCertificatesUseCase } from '@/src/core/infra/factories/make-register-multiple-certificates.use-case.factory';
-import { makeSaveMultipleCertificatesFileUseCase } from '@/src/core/infra/factories/make-save-multiple-certificates-file.use-case.factory copy';
+import { makeSaveMultipleCertificatesFileUseCase } from '@/src/core/infra/factories/make-save-multiple-certificates-file.use-case.factory';
 import { CertificateDraftArraySchema, CertificateDraftErrorsSchema, CertificateDraftSchemaDTO } from '@/src/core/infra/http/schemas/certificate-student-data.schema';
 import { NextResponse } from 'next/server';
 import z from 'zod';
@@ -39,12 +38,10 @@ export async function POST(req: Request) {
 
   try {
     const saveFiles = await makeSaveMultipleCertificatesFileUseCase().execute(data);
-    const registerCertificates = await makeRegisterMultipleCertificatesUseCase()
-      .execute(saveFiles.draftCertificates);
 
     return NextResponse.json({
       success: true,
-      data: CertificatePresenter.toManyViewModel(registerCertificates.certificates),
+      data: CertificatePresenter.toManyViewModel(saveFiles.certificates),
     });
   } catch (error: any) {
     return NextResponse.json(

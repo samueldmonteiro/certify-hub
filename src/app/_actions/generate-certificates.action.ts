@@ -2,8 +2,7 @@
 
 import { Certificate } from '@/src/core/domain/entities/certificate.entity';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
-import { makeRegisterMultipleCertificatesUseCase } from '@/src/core/infra/factories/make-register-multiple-certificates.use-case.factory';
-import { makeSaveMultipleCertificatesFileUseCase } from '@/src/core/infra/factories/make-save-multiple-certificates-file.use-case.factory copy';
+import { makeSaveMultipleCertificatesFileUseCase } from '@/src/core/infra/factories/make-save-multiple-certificates-file.use-case.factory';
 import { CertificateDraftArraySchema, CertificateDraftErrorsSchema } from '@/src/core/infra/http/schemas/certificate-student-data.schema';
 import z from 'zod';
 
@@ -28,10 +27,9 @@ export const generateCertificates = async (
 
   try {
     const saveFiles = await makeSaveMultipleCertificatesFileUseCase().execute(data);
-    const registerCertificates = await makeRegisterMultipleCertificatesUseCase().execute(saveFiles.draftCertificates);
     return {
       success: true,
-      data: registerCertificates.certificates,
+      data: saveFiles.certificates,
     };
   } catch (error: any) {
     return {

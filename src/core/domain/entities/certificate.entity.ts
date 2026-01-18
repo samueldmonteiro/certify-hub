@@ -124,4 +124,8 @@ export class Certificate {
   changePtsBook(newPts: PTSBook): void {
     this.props.ptsBook = newPts;
   }
+
+  changeFileURL(newFileURL: string): void {
+    this.props.fileURL = newFileURL;
+  }
 }

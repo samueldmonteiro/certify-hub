@@ -4,6 +4,7 @@ import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-dr
 import { SaveMultipleCertificatesFileUseCase } from '@/src/core/application/use-cases/certificate/save-multiple-certificates-file.use-case';
 import { PlaywrightPDFCertificateGenerator } from '@/src/core/infra/pdf/playwright-pdf-certify-generator';
 import { VercelStoragePDFCertificate } from '@/src/core/infra/storage/vercel-storage-pdf-certificate';
+import { PrismaCertificateRepository } from '@/src/core/infra/database/prisma/prisma-certificate.repository';
 
 
 let sut: SaveMultipleCertificatesFileUseCase;
@@ -13,6 +14,7 @@ beforeEach(() => {
   sut = new SaveMultipleCertificatesFileUseCase(
     new PlaywrightPDFCertificateGenerator,
     new VercelStoragePDFCertificate(),
+    new PrismaCertificateRepository(),
   );
 });
 
@@ -37,13 +39,13 @@ describe('SaveMultipleCertificatesFileUseCase (Int)', () => {
 
     const response = await sut.execute(draftCerts);
 
-    expect(response.draftCertificates[0].fileUrl).toMatch(/^https?:\/\//);
-    expect(response.draftCertificates[1].fileUrl).toMatch(/^https?:\/\//);
+    expect(response.certificates[0].fileURL).toMatch(/^https?:\/\//);
+    expect(response.certificates[1].fileURL).toMatch(/^https?:\/\//);
 
-    expect(response.draftCertificates[0].fileUrl).toContain('vercel');
-    expect(response.draftCertificates[1].fileUrl).toContain('vercel');
+    expect(response.certificates[0].fileURL).toContain('vercel');
+    expect(response.certificates[1].fileURL).toContain('vercel');
 
-    expect(response.draftCertificates[0].courseName).toBe('Course 1');
-    expect(response.draftCertificates[1].courseName).toBe('Course 2');
+    expect(response.certificates[0].courseName).toBe('Course 1');
+    expect(response.certificates[1].courseName).toBe('Course 2');
   });
 });

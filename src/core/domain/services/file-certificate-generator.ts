@@ -1,5 +1,5 @@
-import { CertificateDraft } from '../value-objects/certificate-draft.value-object';
+import { Certificate } from '../entities/certificate.entity';
 
 export interface FileCertificateGenerator {
-  generate(data: CertificateDraft): Promise<Buffer>
+  generate(data: Certificate): Promise<Buffer>
 }

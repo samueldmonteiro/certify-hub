@@ -4,16 +4,17 @@ import { FailFileCertificateGeneratorError } from '../../domain/errors/fail-file
 import { generateCertificateHTML } from '@/src/app/certificado/client';
 import path from 'path';
 import fs from 'fs';
-import { CertificateDraft } from '../../domain/value-objects/certificate-draft.value-object';
+import { Certificate } from '../../domain/entities/certificate.entity';
+
 
 export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerator {
 
-  async generate(data: CertificateDraft): Promise<Buffer> {
+  async generate(data: Certificate): Promise<Buffer> {
 
     try {
       const logoBuffer = fs.readFileSync(path.join(process.cwd(), 'src/app/assets/logo.png'));
       const seloBuffer = fs.readFileSync(path.join(process.cwd(), 'src/app/assets/selo.png'));
-      
+
       const logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
       const seloBase64 = `data:image/png;base64,${seloBuffer.toString('base64')}`;
 
@@ -24,9 +25,12 @@ export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerat
         hours: data.workload,
         logoSrc: logoBase64,
         seloSrc: seloBase64,
+        registrationNumber: data?.registrationNumber?.getValue() ?? '0001/2026',
+        page: data?.page?.getValue() ?? '001/2026',
+        ptsBook: data?.ptsBook?.getValue() ?? '001/2026',
         studentName: data.studentName,
       });
-  
+
       const browser = await chromium.launch();
       const page = await browser.newPage();
 

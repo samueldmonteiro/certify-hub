@@ -18,7 +18,7 @@ export interface PaginatedResult<T> {
 export interface ICertificateRepository {
   findById(id: string): Promise<Certificate | null>
   create(certificate: Certificate): Promise<Certificate>
-
+  lastCreated(): Promise<Certificate | null>
   search(
     params: CertificateSearchParams
   ): Promise<PaginatedResult<Certificate>>

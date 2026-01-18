@@ -1,3 +1,4 @@
+
 interface CertificateData {
   studentName: string;
   cpf: string;
@@ -6,11 +7,14 @@ interface CertificateData {
   hours: number;
   logoSrc: string;
   seloSrc: string;
+  registrationNumber: string;
+  page: string;
+  ptsBook: string;
 }
 
 export function generateCertificateHTML(data: CertificateData): string {
-  const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc } = data;
-  
+  const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc, registrationNumber, page, ptsBook } = data;
+
   return `<!DOCTYPE html>
 <html>
   <head>
@@ -404,9 +408,9 @@ export function generateCertificateHTML(data: CertificateData): string {
         <div class="box">
           <strong>PRESERVAR Serviços e Treinamentos</strong>
           <p>37.075.049/0001-13</p>
-          <p>Registro Nº 001/2026</p>
-          <p>Folha 001/2026</p>
-          <p>Livro PTS 001/2026</p>
+          <p>Registro Nº ${registrationNumber}</p>
+          <p>Folha ${page}</p>
+          <p>Livro PTS ${ptsBook}</p>
         </div>
         <div class="box">
           <strong>Certificado emitido conforme</strong>
