@@ -10,6 +10,14 @@ import { CertificateWhereInput } from '@/generated/prisma/models';
 
 export class PrismaCertificateRepository implements ICertificateRepository {
 
+  async delete(id: string): Promise<void> {
+    await prisma.certificate.delete({ where: { id } });
+  }
+
+  async deleteMany(ids: string[]): Promise<void> {
+    await prisma.certificate.deleteMany({ where: { id: { in: ids } } });
+  }
+
   async lastCreated(): Promise<Certificate | null> {
     const lastCert = await prisma.certificate.findFirst({
       orderBy: { createdAt: 'desc' },

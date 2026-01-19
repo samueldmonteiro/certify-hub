@@ -23,6 +23,8 @@ const certificateRepositoryMock: Mocked<ICertificateRepository> = {
   findById: vi.fn(),
   search: vi.fn(),
   lastCreated: vi.fn(),
+  delete: vi.fn(),
+  deleteMany: vi.fn(),
 };
 
 let sut: SaveMultipleCertificatesFileUseCase;

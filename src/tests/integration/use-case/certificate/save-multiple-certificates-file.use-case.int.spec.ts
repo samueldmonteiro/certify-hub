@@ -5,16 +5,19 @@ import { SaveMultipleCertificatesFileUseCase } from '@/src/core/application/use-
 import { VercelStoragePDFCertificate } from '@/src/core/infra/storage/vercel-storage-pdf-certificate';
 import { PrismaCertificateRepository } from '@/src/core/infra/database/prisma/prisma-certificate.repository';
 import { PuppeteerPDFCertificateGenerator } from '@/src/core/infra/pdf/puppeteer-pdf-certificate-generator';
+import { prisma } from '@/src/lib/prisma';
 
 let sut: SaveMultipleCertificatesFileUseCase;
 
-beforeEach(() => {
+beforeEach(async () => {
 
   sut = new SaveMultipleCertificatesFileUseCase(
     new PuppeteerPDFCertificateGenerator(),
     new VercelStoragePDFCertificate(),
     new PrismaCertificateRepository(),
   );
+
+  await prisma.certificate.deleteMany({});
 });
 
 describe('SaveMultipleCertificatesFileUseCase (Int)', () => {

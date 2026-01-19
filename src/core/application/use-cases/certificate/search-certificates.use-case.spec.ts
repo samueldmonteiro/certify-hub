@@ -16,6 +16,9 @@ const certificateRepoMock: Mocked<ICertificateRepository> = {
   search: vi.fn(),
   create: vi.fn(),
   findById: vi.fn(),
+  delete: vi.fn(),
+  deleteMany: vi.fn(),
+  lastCreated: vi.fn(),
 };
 
 let sut: SearchCertificatesUseCase;
@@ -26,7 +29,7 @@ describe('SearchCertificatesUseCase (Unit)', () => {
   });
 
   it('should search certificates using repository and return paginated result', async () => {
-    
+
     const params: CertificateSearchParams = {
       studentName: 'João',
       page: 1,
