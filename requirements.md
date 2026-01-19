@@ -21,7 +21,7 @@
 
 - [x] RF09 – Deve ser possível gerar certificados automaticamente a partir dos dados da planilha.
 
-- [] RF10 – Deve ser possível gerar um certificado individual a partir de uma inscrição única de aluno.
+- [x] RF10 – Deve ser possível gerar um certificado individual a partir de uma inscrição única de aluno.
 
 - [x] RF11 – Deve ser possível preencher automaticamente nome, CPF e demais dados no certificado.
 
@@ -60,16 +60,16 @@
 
 #### Regras de Negócio (RN)
 
-- [] RN01 – Cada certificado deve possuir um número identificador único no formato XXX/AAAA (ex: 015/2026).
+- [x] RN01 – Cada certificado deve possuir um número identificador único no formato XXX/AAAA (ex: 015/2026).
 
-- [] RN02 – Cada certificado deve conter a informação da página no formato PP/AAAA (ex: 03/2026).
+- [x] RN02 – Cada certificado deve conter a informação da página no formato PP/AAAA (ex: 03/2026).
 
-- [] RN03 – A cada 50 certificados gerados, o número da página deve ser incrementado automaticamente.
+- [x] RN03 – A cada 50 certificados gerados, o número da página deve ser incrementado automaticamente.
 
-- [] RN04 – O ano (AAAA) deve corresponder ao ano corrente no momento da geração.
+- [x] RN04 – O ano (AAAA) deve corresponder ao ano corrente no momento da geração.
 
-- [] RN05 – Certificados só podem ser gerados a partir de dados válidos (planilha validada ou inscrição individual).
+- [x] RN05 – Certificados só podem ser gerados a partir de dados válidos (planilha validada ou inscrição individual).
 
-- [] RN06 – Um certificado não pode ser gerado sem CPF e nome válidos.
+- [x] RN06 – Um certificado não pode ser gerado sem CPF e nome válidos.
 
-- [] RN07 – O template visual do certificado deve ser aplicado de forma consistente em todas as gerações.
+- [x] RN07 – O template visual do certificado deve ser aplicado de forma consistente em todas as gerações.
