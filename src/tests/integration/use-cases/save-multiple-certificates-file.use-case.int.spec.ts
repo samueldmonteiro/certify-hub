@@ -2,17 +2,16 @@ import { beforeEach, describe, it, expect } from 'vitest';
 import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { SaveMultipleCertificatesFileUseCase } from '@/src/core/application/use-cases/certificate/save-multiple-certificates-file.use-case';
-import { PlaywrightPDFCertificateGenerator } from '@/src/core/infra/pdf/playwright-pdf-certify-generator';
 import { VercelStoragePDFCertificate } from '@/src/core/infra/storage/vercel-storage-pdf-certificate';
 import { PrismaCertificateRepository } from '@/src/core/infra/database/prisma/prisma-certificate.repository';
-
+import { PuppeteerPDFCertificateGenerator } from '@/src/core/infra/pdf/puppeteer-pdf-certificate-generator';
 
 let sut: SaveMultipleCertificatesFileUseCase;
 
 beforeEach(() => {
 
   sut = new SaveMultipleCertificatesFileUseCase(
-    new PlaywrightPDFCertificateGenerator,
+    new PuppeteerPDFCertificateGenerator(),
     new VercelStoragePDFCertificate(),
     new PrismaCertificateRepository(),
   );

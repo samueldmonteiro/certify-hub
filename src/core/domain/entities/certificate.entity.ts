@@ -84,6 +84,11 @@ export class Certificate {
     return this.props.fileURL;
   }
 
+  getCPFFormatted(): string {
+    const formatted = this.props.cpf.getValue().replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, '$1.$2.$3-$4');
+    return formatted;
+  }
+
   changeStudentName(newName: string): void {
     if (newName.trim().length < 3) {
       throw new DomainError('Nome do estudante deve conter pelo menos 3 caracteres');

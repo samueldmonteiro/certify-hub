@@ -6,7 +6,6 @@ import path from 'path';
 import fs from 'fs';
 import { Certificate } from '../../domain/entities/certificate.entity';
 
-
 export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerator {
 
   async generate(data: Certificate): Promise<Buffer> {
@@ -20,7 +19,7 @@ export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerat
 
       const html = generateCertificateHTML({
         courseName: data.courseName,
-        cpf: data.cpf.getValue(),
+        cpf: data.getCPFFormatted(),
         date: data.completionDate,
         hours: data.workload,
         logoSrc: logoBase64,

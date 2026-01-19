@@ -11,7 +11,6 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
     let browser;
 
     try {
-      // Carregar imagens como base64
       const logoBuffer = fs.readFileSync(
         path.join(process.cwd(), 'src/app/assets/logo.png'),
       );
@@ -25,7 +24,7 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
       // Renderizar o HTML
       const html = generateCertificateHTML({
         courseName: data.courseName,
-        cpf: data.cpf.getValue(),
+        cpf: data.getCPFFormatted(),
         date: data.completionDate,
         hours: data.workload,
         logoSrc: logoBase64,

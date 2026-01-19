@@ -1,5 +1,5 @@
 
-interface CertificateData {
+interface CertificateTemplateData {
   studentName: string;
   cpf: string;
   courseName: string;
@@ -12,7 +12,7 @@ interface CertificateData {
   ptsBook: string;
 }
 
-export function generateCertificateHTML(data: CertificateData): string {
+export function generateCertificateHTML(data: CertificateTemplateData): string {
   const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc, registrationNumber, page, ptsBook } = data;
 
   return `<!DOCTYPE html>
@@ -104,6 +104,7 @@ export function generateCertificateHTML(data: CertificateData): string {
         text-transform: uppercase;
         margin-bottom: 5mm;
         letter-spacing: 6px;
+        margin-top:-25px;
       }
 
       .front .divider {
@@ -114,10 +115,10 @@ export function generateCertificateHTML(data: CertificateData): string {
       }
 
       .front .description {
-        font-size: 15px;
+        font-size: 20px;
         line-height: 1.9;
         padding: 0 60mm;
-        width: 1000px;
+        width: 1100px;
         margin: 0 auto;
         margin-top: -40px;
       }
@@ -129,16 +130,16 @@ export function generateCertificateHTML(data: CertificateData): string {
       .front .logo {
         position: absolute;
         top: 15mm;
-        right: 35mm;
-        width: 95px;
+        right: 15mm;
+        width: 140px;
         z-index: 20;
       }
 
       .front .footer {
         position: absolute;
-        bottom: 25mm;
-        left: 35mm;
-        right: 35mm;
+        bottom: 18mm;
+        left: 40mm;
+        right: 25mm;
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -170,15 +171,17 @@ export function generateCertificateHTML(data: CertificateData): string {
       }
 
       .front .seal {
-        width: 120px;
-        height: 120px;
+        width: 150px;
+        height: 150px;
         margin: 0 30px;
-        margin-bottom: 8px;
+        position:relative;
+        left:-60px;
+        display:block;
       }
 
       /* ============ ESTILOS DO VERSO ============ */
       .back {
-        background: #1e1e1e;
+        background: #1e1e1ee9;
         color: white;
         overflow: hidden;
       }
@@ -258,7 +261,7 @@ export function generateCertificateHTML(data: CertificateData): string {
       }
 
       .back .box {
-        border: 1px solid rgba(255,255,255,0.5);
+        border: 1px solid black;
         padding: 12px;
         margin-bottom: 18px;
       }
@@ -276,9 +279,19 @@ export function generateCertificateHTML(data: CertificateData): string {
 
       .back .logo {
         width: 150px;
-        margin: 0 auto 10px auto;
         display: block;
+        position:absolute;
+        left: 180px;
+      }
+
+      .back .logo-text{
+        text-align: center;
+        font-size: 12px;
+        color: black;
         margin-bottom: 40px;
+        position:relative;
+        right:-80px;
+        margin-top: 10px;
       }
 
       .workload {
@@ -351,22 +364,22 @@ export function generateCertificateHTML(data: CertificateData): string {
 
     <!-- PÁGINA 2: VERSO DO CERTIFICADO -->
     <div class="page back">
-      <svg class="decorations" viewBox="0 0 1000 707" preserveAspectRatio="none">
-        <polygon points="0,0 420,0 0,420" fill="#f57c00" />
-        <polygon points="0,0 380,0 0,380" fill="#ffb74d" opacity="0.95" />
-        <polygon points="0,0 340,0 0,340" fill="#ff9800" opacity="0.9" />
-        <polygon points="0,0 280,0 0,280" fill="#d32f2f" opacity="0.85" />
-        <line x1="0" y1="220" x2="220" y2="0" stroke="white" stroke-width="8" opacity="0.6" />
-        <line x1="0" y1="280" x2="150" y2="130" stroke="white" stroke-width="6" opacity="0.5" />
-        <polygon points="0,240 60,180 0,180" fill="white" opacity="0.4" />
-        <polygon points="1000,707 580,707 1000,287" fill="#ffb74d" />
-        <polygon points="1000,707 620,707 1000,327" fill="#ff9800" opacity="0.95" />
-        <polygon points="1000,707 680,707 1000,387" fill="#d32f2f" opacity="0.9" />
-        <polygon points="1000,707 740,707 1000,447" fill="#f57c00" opacity="0.85" />
-        <rect x="880" y="600" width="80" height="100" fill="#ff6f00" opacity="0.7" transform="rotate(45 920 650)" />
-        <line x1="1000" y1="487" x2="780" y2="707" stroke="white" stroke-width="8" opacity="0.6" />
-        <line x1="1000" y1="427" x2="850" y2="577" stroke="white" stroke-width="6" opacity="0.5" />
-      </svg>
+     <svg class="decorations" viewBox="0 0 1000 707" preserveAspectRatio="none">
+    <polygon points="0,0 420,0 0,420" fill="#d84315" opacity="0.7" />
+    <polygon points="0,0 380,0 0,380" fill="#e65100" opacity="0.65" />
+    <polygon points="0,0 340,0 0,340" fill="#ef6c00" opacity="0.6" />
+    <polygon points="0,0 280,0 0,280" fill="#b71c1c" opacity="0.55" />
+    <line x1="0" y1="220" x2="220" y2="0" stroke="white" stroke-width="8" opacity="0.4" />
+    <line x1="0" y1="280" x2="150" y2="130" stroke="white" stroke-width="6" opacity="0.35" />
+    <polygon points="0,240 60,180 0,180" fill="white" opacity="0.3" />
+    <polygon points="1000,707 580,707 1000,287" fill="#e65100" opacity="0.7" />
+    <polygon points="1000,707 620,707 1000,327" fill="#ef6c00" opacity="0.65" />
+    <polygon points="1000,707 680,707 1000,387" fill="#b71c1c" opacity="0.6" />
+    <polygon points="1000,707 740,707 1000,447" fill="#d84315" opacity="0.55" />
+    <rect x="880" y="600" width="80" height="100" fill="#d84315" opacity="0.5" transform="rotate(45 920 650)" />
+    <line x1="1000" y1="487" x2="780" y2="707" stroke="white" stroke-width="8" opacity="0.4" />
+    <line x1="1000" y1="427" x2="850" y2="577" stroke="white" stroke-width="6" opacity="0.35" />
+</svg>
 
       <div class="content-left">
         <h2>CONTEÚDO PROGRAMÁTICO :</h2>
@@ -405,6 +418,11 @@ export function generateCertificateHTML(data: CertificateData): string {
 
       <div class="content-right">
         <img src="${logoSrc}" class="logo" />
+        <div class="logo-text">
+        CNPJ: 37.075.049/0001-13<br>
+        Avenida 03,nº 13, Conjunto Vinhais<br>
+        CEP 65071-020, São Luís - MA
+        </div>
         <div class="box">
           <strong>PRESERVAR Serviços e Treinamentos</strong>
           <p>37.075.049/0001-13</p>

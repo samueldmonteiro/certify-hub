@@ -21,7 +21,6 @@ import Link from 'next/link';
 import {
   FilePlus,
   FileText,
-  Settings,
 } from 'lucide-react';
 
 export const data = {

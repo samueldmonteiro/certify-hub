@@ -17,7 +17,6 @@ function GenerationSuccessModal({
   isOpen,
   onClose,
   totalCertificates,
-  onDownloadAll,
   isDownloading,
 }: {
   isOpen: boolean;
