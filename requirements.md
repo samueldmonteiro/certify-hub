@@ -54,9 +54,9 @@
 
 ##### Usabilidade
 
-- [] RNF08 – O sistema deve fornecer mensagens claras de erro em caso de planilha inválida.
+- [x] RNF08 – O sistema deve fornecer mensagens claras de erro em caso de planilha inválida.
 
-- [] RNF09 – O sistema deve indicar o progresso da geração dos certificados quando aplicável.
+- [x] RNF09 – O sistema deve indicar o progresso da geração dos certificados quando aplicável.
 
 #### Regras de Negócio (RN)
 

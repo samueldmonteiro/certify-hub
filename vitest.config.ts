@@ -9,6 +9,17 @@ export default defineConfig({
   },
 
   test: {
+    exclude: [
+      'node_modules',
+      '.next',
+      'out',
+      '.vercel',
+      'dist',
+      '.turbo',
+      'coverage',
+      './src/app/**',
+    ],
+
     dir: '/src',
     projects: [
       {

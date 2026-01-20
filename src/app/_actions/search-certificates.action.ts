@@ -18,7 +18,7 @@ export const searchCertificatesAction =
       const response = await makeSearchCertificatesUseCase().execute(params);
 
       const certificatesViewModel = CertificatePresenter.toManyViewModel(response.items);
-      
+
       return {
         success: true,
         data: {

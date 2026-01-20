@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileSpreadsheet, Plus, Download, FileCheck, Loader2, X, ShowerHead } from 'lucide-react';
+import { FileSpreadsheet, Plus, FileCheck, Loader2, X, Eye, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/src/app/_components/ui/tabs';
 import FileUploadSection from '@/src/app/_components/generate-certificate/file-upload-section';
 import StudentTable from '@/src/app/_components/generate-certificate/student-table';
@@ -29,13 +29,11 @@ function GenerationSuccessModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={!isDownloading ? onClose : undefined}
       />
 
-      {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-300">
         <button
           onClick={onClose}
@@ -45,7 +43,6 @@ function GenerationSuccessModal({
           <X className="h-5 w-5" />
         </button>
 
-        {/* Ícone de Sucesso com Animação */}
         <div className="flex justify-center mb-6">
           <div className="relative">
             <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75" />
@@ -68,23 +65,8 @@ function GenerationSuccessModal({
             disabled={isDownloading}
             className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isDownloading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Baixando...
-              </>
-            ) :
-              false ? (
-                <>
-                  <Download className="h-5 w-5" />
-                  {totalCertificates === 1 ? 'Baixar Certificado' : 'Baixar Todos os Certificados'}
-                </>
-              ) : (
-                <>
-                  <ShowerHead className="h-5 w-5" />
-                  {totalCertificates === 1 ? 'Visualizar Certificado' : 'Visualzar Certificados'}</>
-              )
-            }
+            <Eye className="h-5 w-5" />
+            {totalCertificates === 1 ? 'Visualizar Certificado' : 'Visualizar Certificados'}
           </button>
 
           <button
@@ -100,8 +82,17 @@ function GenerationSuccessModal({
   );
 }
 
-// Overlay de Geração com Animação
-function GeneratingOverlay({ isGenerating, progress }: { isGenerating: boolean; progress: number }) {
+function GeneratingOverlay({ 
+  isGenerating, 
+  progress, 
+  currentCount, 
+  totalCount, 
+}: { 
+  isGenerating: boolean; 
+  progress: number;
+  currentCount: number;
+  totalCount: number;
+}) {
   if (!isGenerating) return null;
 
   return (
@@ -109,10 +100,9 @@ function GeneratingOverlay({ isGenerating, progress }: { isGenerating: boolean; 
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
-        {/* Spinner Animado */}
         <div className="flex justify-center mb-6">
           <div className="relative">
-            <div className="absolute inset-0 bg-blue-100 rounded-full animate-pulse" />
+            <div className="absolute inset-0 bg-orange-100 rounded-full animate-pulse" />
             <div className="relative">
               <Loader2 className="h-16 w-16 text-orange-600 animate-spin" />
             </div>
@@ -122,34 +112,127 @@ function GeneratingOverlay({ isGenerating, progress }: { isGenerating: boolean; 
         <h3 className="text-xl text-gray-700 font-bold text-center mb-2">
           Gerando Certificados
         </h3>
-        <p className="text-center text-gray-600 mb-6">
-          Por favor, aguarde enquanto processamos seus certificados...
-        </p>
+        
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-center gap-2 text-blue-900">
+            <CheckCircle2 className="h-5 w-5 text-blue-600" />
+            <span className="font-semibold text-lg">
+              {currentCount} de {totalCount}
+            </span>
+          </div>
+          <p className="text-center text-blue-700 text-sm mt-1">
+            {currentCount === totalCount 
+              ? 'Finalizando processamento...' 
+              : 'certificados gerados'}
+          </p>
+        </div>
 
-        {/* Barra de Progresso */}
-        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden mb-2">
           <div
-            className="bg-linear-to-r from-orange-500 to-orange-600 h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden"
+            className="bg-gradient-to-r from-orange-500 to-orange-600 h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden"
             style={{ width: `${progress}%` }}
           >
-            <div className="absolute inset-0 bg-white/30 animate-[shimmer_1s_infinite]" />
+            <div className="absolute inset-0 bg-white/30 animate-shimmer" />
           </div>
         </div>
-        <p className="text-center text-sm text-gray-500 mt-2">
-          {progress}%
+        
+        <p className="text-center text-sm text-gray-500">
+          {progress}% concluído
+        </p>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          Por favor, não feche esta janela
         </p>
       </div>
 
       <style jsx>{`
         @keyframes shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+          animation: shimmer 1.5s infinite;
         }
       `}</style>
+    </div>
+  );
+}
+
+function ErrorModal({
+  isOpen,
+  onClose,
+  errorMessage,
+  studentName,
+  generatedCount,
+  totalCount,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  errorMessage: string;
+  studentName?: string;
+  generatedCount: number;
+  totalCount: number;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-300">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <div className="flex justify-center mb-6">
+          <div className="relative">
+            <div className="bg-red-100 rounded-full p-4">
+              <AlertCircle className="h-12 w-12 text-red-600" />
+            </div>
+          </div>
+        </div>
+
+        <h2 className="text-gray-700 text-2xl font-bold text-center mb-2">
+          Erro na Geração
+        </h2>
+
+        {generatedCount > 0 && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <p className="text-yellow-900 text-sm text-center">
+              <span className="font-semibold">{generatedCount} de {totalCount}</span> certificados foram gerados antes do erro
+            </p>
+          </div>
+        )}
+
+        {studentName && (
+          <p className="text-center text-gray-600 mb-2">
+            Erro ao processar: <span className="font-semibold">{studentName}</span>
+          </p>
+        )}
+
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <p className="text-red-800 text-sm">
+            <span className="font-semibold">Detalhes do erro:</span>
+            <br />
+            {errorMessage}
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <button
+            onClick={onClose}
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+          >
+            Entendi
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -159,7 +242,11 @@ export default function CertificadosPage() {
   const [selectedStudents, setSelectedStudents] = useState<CertificateDraft[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentCount, setCurrentCount] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorStudentName, setErrorStudentName] = useState('');
   const [generatedCount, setGeneratedCount] = useState(0);
   const [studentsDataError, setStudentsDataError] = useState<string | null>(null);
   const [generatedCertificates, setGeneratedCertificates] = useState<any[]>([]);
@@ -197,34 +284,32 @@ export default function CertificadosPage() {
     setIsGenerating(true);
     setStudentsDataError(null);
     setProgress(0);
+    setCurrentCount(0);
     setGeneratedCertificates([]);
+    setGeneratedCount(0);
 
-    const dataRequest: any[] = [];
-    selectedStudents.forEach(d => {
-      dataRequest.push({
+    const totalStudents = selectedStudents.length;
+    const batchSize = 2;
+    const batches: any[][] = [];
+    
+    for (let i = 0; i < selectedStudents.length; i += batchSize) {
+      const batchStudents = selectedStudents.slice(i, i + batchSize);
+      const batchData = batchStudents.map(d => ({
         studentName: d.studentName,
         courseName: d.courseName,
         completionDate: formatDateToPTBR(d.completionDate),
         cpf: d.cpf.getValue(),
         workload: d.workload,
-      });
-    });
-
-    // Dividir em lotes de 2
-    const batchSize = 2;
-    const batches: any[][] = [];
-    for (let i = 0; i < dataRequest.length; i += batchSize) {
-      batches.push(dataRequest.slice(i, i + batchSize));
+      }));
+      batches.push(batchData);
     }
 
     setProgress(5);
 
     try {
-      let allErrors: any = null;
       let successCount = 0;
       const allCertificates: any[] = [];
 
-      // Processar cada lote
       for (let i = 0; i < batches.length; i++) {
         const batch = batches[i];
 
@@ -237,42 +322,45 @@ export default function CertificadosPage() {
         });
 
         const generate = await res.json() as GenerateCertificatesResponse;
-        console.log('Batch response:', generate);
 
-        // Atualizar progresso
-        const progressPercent = Math.floor(((i + 1) / batches.length) * 85) + 5;
-        setProgress(progressPercent);
-
-        // Acumular erros se houver
         if (generate.errors || !generate.success) {
-          if (!allErrors) {
-            allErrors = generate.errors;
-          }
-          break; // Para no primeiro erro
-        } else if (generate.data) {
+          const errorMsg = getFirstZodError(generate.errors) || 'Erro desconhecido ao processar certificado';
+          const studentName = batch[0]?.studentName || 'Aluno desconhecido';
+          
+          setIsGenerating(false);
+          setErrorMessage(errorMsg);
+          setErrorStudentName(studentName);
+          setGeneratedCount(successCount);
+          setShowErrorModal(true);
+          return;
+        } 
+        
+        if (generate.data) {
           successCount += generate.data.length;
           allCertificates.push(...generate.data);
+          setCurrentCount(successCount);
         }
+
+        const progressPercent = Math.floor(((i + 1) / batches.length) * 90) + 5;
+        setProgress(progressPercent);
       }
 
-      // Progresso final
       setProgress(95);
       await new Promise(resolve => setTimeout(resolve, 300));
       setProgress(100);
       await new Promise(resolve => setTimeout(resolve, 400));
 
       setIsGenerating(false);
+      setGeneratedCertificates(allCertificates);
+      setGeneratedCount(successCount);
+      setShowSuccessModal(true);
 
-      if (allErrors) {
-        setStudentsDataError('Erro em algum dos dados do arquivo: ' + getFirstZodError(allErrors));
-      } else {
-        setGeneratedCertificates(allCertificates);
-        setGeneratedCount(successCount);
-        setShowSuccessModal(true);
-      }
     } catch (error) {
       setIsGenerating(false);
-      setStudentsDataError('Erro ao gerar certificados. Tente novamente.');
+      setErrorMessage('Erro de conexão ao gerar certificados. Verifique sua internet e tente novamente.');
+      setErrorStudentName('');
+      setGeneratedCount(currentCount);
+      setShowErrorModal(true);
       console.error('Erro ao gerar certificados:', error);
     }
   };
@@ -282,17 +370,19 @@ export default function CertificadosPage() {
     setStudentsDataError(null);
     setGeneratedCertificates([]);
     setProgress(15);
-    await new Promise(resolve => setTimeout(resolve, 600));
+    setCurrentCount(0);
+    setGeneratedCount(0);
+    
+    await new Promise(resolve => setTimeout(resolve, 400));
     setProgress(30);
 
-    const dataRequest: any[] = [];
-    dataRequest.push({
+    const dataRequest = [{
       studentName: student.studentName,
       courseName: student.courseName,
       completionDate: formatDateToPTBR(student.completionDate),
       cpf: student.cpf.getValue(),
       workload: student.workload,
-    });
+    }];
 
     try {
       setProgress(50);
@@ -305,22 +395,32 @@ export default function CertificadosPage() {
       });
 
       const response = await res.json() as GenerateCertificatesResponse;
-      console.log('Single student response:', response);
 
+      setProgress(90);
+      await new Promise(resolve => setTimeout(resolve, 300));
       setProgress(100);
       await new Promise(resolve => setTimeout(resolve, 300));
+      
       setIsGenerating(false);
 
       if (response.errors || !response.success) {
-        setStudentsDataError('Erro ao gerar certificado: ' + (getFirstZodError(response.errors) || 'Erro desconhecido'));
+        const errorMsg = getFirstZodError(response.errors) || 'Erro desconhecido ao gerar certificado';
+        setErrorMessage(errorMsg);
+        setErrorStudentName(student.studentName);
+        setGeneratedCount(0);
+        setShowErrorModal(true);
       } else if (response.data) {
+        setCurrentCount(1);
         setGeneratedCertificates(response.data);
         setGeneratedCount(response.data.length);
         setShowSuccessModal(true);
       }
     } catch (error) {
       setIsGenerating(false);
-      setStudentsDataError('Erro ao gerar certificado. Tente novamente.');
+      setErrorMessage('Erro de conexão ao gerar certificado. Verifique sua internet e tente novamente.');
+      setErrorStudentName(student.studentName);
+      setGeneratedCount(0);
+      setShowErrorModal(true);
       console.error('Erro ao gerar certificado:', error);
     }
   };
@@ -332,7 +432,6 @@ export default function CertificadosPage() {
 
     try {
       if (generatedCertificates.length === 1) {
-        // Download único
         const cert = generatedCertificates[0];
         if (cert.fileURL) {
           const link = document.createElement('a');
@@ -343,7 +442,6 @@ export default function CertificadosPage() {
           document.body.removeChild(link);
         }
       } else {
-        // Download múltiplo
         for (const cert of generatedCertificates) {
           if (cert.fileURL) {
             const link = document.createElement('a');
@@ -352,14 +450,12 @@ export default function CertificadosPage() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            // Pequeno delay entre downloads para não sobrecarregar o navegador
             await new Promise(resolve => setTimeout(resolve, 300));
           }
         }
       }
 
       setIsDownloading(false);
-      // Fecha a modal após o download
       setTimeout(() => {
         setShowSuccessModal(false);
       }, 500);
@@ -425,14 +521,28 @@ export default function CertificadosPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Overlays */}
-      <GeneratingOverlay isGenerating={isGenerating} progress={progress} />
+      <GeneratingOverlay 
+        isGenerating={isGenerating} 
+        progress={progress}
+        currentCount={currentCount}
+        totalCount={selectedStudents.length}
+      />
+      
       <GenerationSuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         totalCertificates={generatedCount}
         onDownloadAll={handleDownloadAll}
         isDownloading={isDownloading}
+      />
+
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        errorMessage={errorMessage}
+        studentName={errorStudentName}
+        generatedCount={generatedCount}
+        totalCount={selectedStudents.length}
       />
     </div>
   );
