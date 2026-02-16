@@ -31,7 +31,7 @@ export function generateCertificateHTML(data: CertificateTemplateData): string {
 
       body {
         margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: Arial, Helvetica, sans-serif !important;
       }
 
       .page {
@@ -49,7 +49,7 @@ export function generateCertificateHTML(data: CertificateTemplateData): string {
       .front {
         background: #f5f5f5;
         color: black;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Arial, Helvetica, sans-serif !important;
       }
 
       .front::before {

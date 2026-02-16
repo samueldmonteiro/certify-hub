@@ -129,7 +129,7 @@ function GeneratingOverlay({
 
         <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden mb-2">
           <div
-            className="bg-gradient-to-r from-orange-500 to-orange-600 h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden"
+            className="bg-linear-to-r from-orange-500 to-orange-600 h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden"
             style={{ width: `${progress}%` }}
           >
             <div className="absolute inset-0 bg-white/30 animate-shimmer" />
@@ -288,7 +288,6 @@ export default function CertificadosPage() {
     setGeneratedCertificates([]);
     setGeneratedCount(0);
 
-    const totalStudents = selectedStudents.length;
     const batchSize = 2;
     const batches: any[][] = [];
     
