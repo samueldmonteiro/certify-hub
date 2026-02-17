@@ -1,7 +1,8 @@
+import 'dotenv/config';
 import { Certificate } from '@/src/core/domain/entities/certificate.entity';
 import { ICertificateRepository } from '@/src/core/domain/repositories/certificate.repository';
 import { FileCertificateGenerator } from '@/src/core/domain/services/file-certificate-generator';
-import { StorageFileCertificate } from '@/src/core/domain/services/storage-file-certificate';
+import { StorageFile } from '@/src/core/domain/services/storage-file';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { CertificatePage } from '@/src/core/domain/value-objects/certificate-page.value-object';
 import { PTSBook } from '@/src/core/domain/value-objects/pts-book.value-object';
@@ -20,7 +21,7 @@ export interface GenerateNextRegistrationNumberResponse {
 export class SaveMultipleCertificatesFileUseCase {
   constructor(
     private fileGenerator: FileCertificateGenerator,
-    private storageFile: StorageFileCertificate,
+    private storageFile: StorageFile,
     private certificateRepo: ICertificateRepository,
   ) { }
 
@@ -81,7 +82,10 @@ export class SaveMultipleCertificatesFileUseCase {
       });
 
       const buffer = await this.fileGenerator.generate(newCert, certificateDraft);
-      const fileURL = await this.storageFile.storage(buffer);
+
+      const path = `${process.env.NODE_ENV == 'test' ? 'tests' : 'certificates'}/certificate-${randomUUID()}.pdf`;
+
+      const fileURL = await this.storageFile.storage(buffer, path);
 
       newCert.changeFileURL(fileURL);
 

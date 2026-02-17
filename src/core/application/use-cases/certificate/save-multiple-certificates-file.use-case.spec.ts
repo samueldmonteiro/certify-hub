@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect, vi, Mocked } from 'vitest';
-import { StorageFileCertificate } from '@/src/core/domain/services/storage-file-certificate';
+import { StorageFile } from '@/src/core/domain/services/storage-file';
 import { FileCertificateGenerator } from '@/src/core/domain/services/file-certificate-generator';
 import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
 import { SaveMultipleCertificatesFileUseCase } from './save-multiple-certificates-file.use-case';
@@ -10,7 +10,7 @@ import { RegistrationNumber } from '@/src/core/domain/value-objects/registration
 import { CertificatePage } from '@/src/core/domain/value-objects/certificate-page.value-object';
 import { PTSBook } from '@/src/core/domain/value-objects/pts-book.value-object';
 
-const storageFileCertificateMock: Mocked<StorageFileCertificate> = {
+const storageFileCertificateMock: Mocked<StorageFile> = {
   storage: vi.fn(),
 };
 
@@ -131,8 +131,8 @@ describe('SaveMultipleCertificatesFileUseCase (Unit)', () => {
       draftCerts[1],
     );
 
-    expect(storageFileCertificateMock.storage).toHaveBeenNthCalledWith(1, bufferMock);
-    expect(storageFileCertificateMock.storage).toHaveBeenNthCalledWith(2, bufferMock);
+    expect(storageFileCertificateMock.storage).toHaveBeenNthCalledWith(1, bufferMock, expect.any(String));
+    expect(storageFileCertificateMock.storage).toHaveBeenNthCalledWith(2, bufferMock, expect.any(String));
 
     expect(response.certificates).toHaveLength(2);
     expect(response.certificates[0].fileURL).toBe('file-url-1');
