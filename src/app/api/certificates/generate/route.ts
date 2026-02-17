@@ -33,6 +33,7 @@ export async function POST(req: Request) {
       cpf: new CPF(d.cpf),
       studentName: d.studentName,
       workload: d.workload,
+      summary: d.summary,
     });
   });
 

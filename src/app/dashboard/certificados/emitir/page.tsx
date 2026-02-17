@@ -82,13 +82,13 @@ function GenerationSuccessModal({
   );
 }
 
-function GeneratingOverlay({ 
-  isGenerating, 
-  progress, 
-  currentCount, 
-  totalCount, 
-}: { 
-  isGenerating: boolean; 
+function GeneratingOverlay({
+  isGenerating,
+  progress,
+  currentCount,
+  totalCount,
+}: {
+  isGenerating: boolean;
   progress: number;
   currentCount: number;
   totalCount: number;
@@ -112,7 +112,7 @@ function GeneratingOverlay({
         <h3 className="text-xl text-gray-700 font-bold text-center mb-2">
           Gerando Certificados
         </h3>
-        
+
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-center gap-2 text-blue-900">
             <CheckCircle2 className="h-5 w-5 text-blue-600" />
@@ -121,8 +121,8 @@ function GeneratingOverlay({
             </span>
           </div>
           <p className="text-center text-blue-700 text-sm mt-1">
-            {currentCount === totalCount 
-              ? 'Finalizando processamento...' 
+            {currentCount === totalCount
+              ? 'Finalizando processamento...'
               : 'certificados gerados'}
           </p>
         </div>
@@ -135,7 +135,7 @@ function GeneratingOverlay({
             <div className="absolute inset-0 bg-white/30 animate-shimmer" />
           </div>
         </div>
-        
+
         <p className="text-center text-sm text-gray-500">
           {progress}% concluído
         </p>
@@ -290,7 +290,7 @@ export default function CertificadosPage() {
 
     const batchSize = 2;
     const batches: any[][] = [];
-    
+
     for (let i = 0; i < selectedStudents.length; i += batchSize) {
       const batchStudents = selectedStudents.slice(i, i + batchSize);
       const batchData = batchStudents.map(d => ({
@@ -299,6 +299,7 @@ export default function CertificadosPage() {
         completionDate: formatDateToPTBR(d.completionDate),
         cpf: d.cpf.getValue(),
         workload: d.workload,
+        summary: d.summary,
       }));
       batches.push(batchData);
     }
@@ -325,15 +326,15 @@ export default function CertificadosPage() {
         if (generate.errors || !generate.success) {
           const errorMsg = getFirstZodError(generate.errors) || 'Erro desconhecido ao processar certificado';
           const studentName = batch[0]?.studentName || 'Aluno desconhecido';
-          
+
           setIsGenerating(false);
           setErrorMessage(errorMsg);
           setErrorStudentName(studentName);
           setGeneratedCount(successCount);
           setShowErrorModal(true);
           return;
-        } 
-        
+        }
+
         if (generate.data) {
           successCount += generate.data.length;
           allCertificates.push(...generate.data);
@@ -371,7 +372,7 @@ export default function CertificadosPage() {
     setProgress(15);
     setCurrentCount(0);
     setGeneratedCount(0);
-    
+
     await new Promise(resolve => setTimeout(resolve, 400));
     setProgress(30);
 
@@ -381,6 +382,7 @@ export default function CertificadosPage() {
       completionDate: formatDateToPTBR(student.completionDate),
       cpf: student.cpf.getValue(),
       workload: student.workload,
+      summary: student.summary,
     }];
 
     try {
@@ -399,7 +401,7 @@ export default function CertificadosPage() {
       await new Promise(resolve => setTimeout(resolve, 300));
       setProgress(100);
       await new Promise(resolve => setTimeout(resolve, 300));
-      
+
       setIsGenerating(false);
 
       if (response.errors || !response.success) {
@@ -468,7 +470,7 @@ export default function CertificadosPage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Brigada de Incêndio e Emergência - Gerar Certificados</h1>
+        <h1 className="text-3xl font-bold mb-2">Gerar Certificados</h1>
         <p className="text-muted-foreground">
           Importe uma planilha ou preencha os dados manualmente para gerar certificados
         </p>
@@ -520,13 +522,13 @@ export default function CertificadosPage() {
         </TabsContent>
       </Tabs>
 
-      <GeneratingOverlay 
-        isGenerating={isGenerating} 
+      <GeneratingOverlay
+        isGenerating={isGenerating}
         progress={progress}
         currentCount={currentCount}
         totalCount={selectedStudents.length}
       />
-      
+
       <GenerationSuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}

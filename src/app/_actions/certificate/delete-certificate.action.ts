@@ -17,10 +17,10 @@ export const deleteCertificateAction = async (id: string): Promise<DeleteCertifi
     return {
       success: true,
     };
-  } catch {
+  } catch (error: any) {
     return {
       success: false,
-      message: 'Erro ao deletar certificado',
+      message: error.message,
     };
   }
 };

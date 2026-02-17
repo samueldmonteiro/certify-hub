@@ -62,8 +62,8 @@ describe('SaveMultipleCertificatesFileUseCase (Unit)', () => {
       studentName: 'Student 1',
       workload: 8,
       fileURL: 'file-url-1',
-      registrationNumber: new RegistrationNumber('0001/2025'),
-      page: new CertificatePage('001/2025'),
+      registrationNumber: new RegistrationNumber(`0001/${currentYear}`),
+      page: new CertificatePage(`001/${currentYear}`),
       ptsBook: new PTSBook(`001/${currentYear}`),
       createdAt: new Date(),
     });
@@ -76,8 +76,8 @@ describe('SaveMultipleCertificatesFileUseCase (Unit)', () => {
       studentName: 'Student 2',
       workload: 9,
       fileURL: 'file-url-2',
-      registrationNumber: new RegistrationNumber('0002/2025'),
-      page: new CertificatePage('001/2025'),
+      registrationNumber: new RegistrationNumber(`0002/${currentYear}`),
+      page: new CertificatePage(`001/${currentYear}`),
       ptsBook: new PTSBook(`001/${currentYear}`),
       createdAt: new Date(),
     });
@@ -114,14 +114,22 @@ describe('SaveMultipleCertificatesFileUseCase (Unit)', () => {
     expect(certificateRepositoryMock.create).toHaveBeenCalledTimes(2);
     expect(certificateRepositoryMock.lastCreated).toHaveBeenCalledTimes(2);
 
-    expect(fileGeneratorMock.generate).toHaveBeenNthCalledWith(1, expect.objectContaining({
-      courseName: 'Course 1',
-      studentName: 'Student 1',
-    }));
-    expect(fileGeneratorMock.generate).toHaveBeenNthCalledWith(2, expect.objectContaining({
-      courseName: 'Course 2',
-      studentName: 'Student 2',
-    }));
+    expect(fileGeneratorMock.generate).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        courseName: 'Course 1',
+        studentName: 'Student 1',
+      }),
+      draftCerts[0],
+    );
+    expect(fileGeneratorMock.generate).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        courseName: 'Course 2',
+        studentName: 'Student 2',
+      }),
+      draftCerts[1],
+    );
 
     expect(storageFileCertificateMock.storage).toHaveBeenNthCalledWith(1, bufferMock);
     expect(storageFileCertificateMock.storage).toHaveBeenNthCalledWith(2, bufferMock);
@@ -131,8 +139,8 @@ describe('SaveMultipleCertificatesFileUseCase (Unit)', () => {
     expect(response.certificates[1].fileURL).toBe('file-url-2');
     expect(response.certificates[0].courseName).toBe('Course 1');
     expect(response.certificates[1].courseName).toBe('Course 2');
-    expect(response.certificates[0].registrationNumber.getValue()).toBe('0001/2025');
-    expect(response.certificates[1].registrationNumber.getValue()).toBe('0002/2025');
+    expect(response.certificates[0].registrationNumber.getValue()).toBe(`0001/${currentYear}`);
+    expect(response.certificates[1].registrationNumber.getValue()).toBe(`0002/${currentYear}`);
   });
 
   it('should generate sequential registration numbers when last certificate exists', async () => {

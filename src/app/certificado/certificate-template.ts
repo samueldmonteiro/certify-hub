@@ -1,5 +1,5 @@
 
-interface CertificateTemplateData {
+export interface CertificateTemplateProps {
   studentName: string;
   cpf: string;
   courseName: string;
@@ -10,10 +10,13 @@ interface CertificateTemplateData {
   registrationNumber: string;
   page: string;
   ptsBook: string;
+  summary?: string;
+  assinatura1Src: string;
+  assinatura2Src: string;
 }
 
-export function generateCertificateHTML(data: CertificateTemplateData): string {
-  const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc, registrationNumber, page, ptsBook } = data;
+export function generateCertificateHTML(data: CertificateTemplateProps): string {
+  const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc, registrationNumber, page, ptsBook, summary, assinatura1Src, assinatura2Src } = data;
 
   return `<!DOCTYPE html>
 <html>
@@ -299,6 +302,12 @@ export function generateCertificateHTML(data: CertificateTemplateData): string {
         display:block;
         margin-left:5px;
       }
+
+      .signature-img {
+        width: 130px;
+        display: block;
+        margin-bottom: -10px;
+      }
     </style>
   </head>
 
@@ -330,12 +339,13 @@ export function generateCertificateHTML(data: CertificateTemplateData): string {
         <p class="student-name">${studentName}</p>
         <div class="divider"></div>
         <div class="description">
-          <p>
-            que sob o CPF: <strong>${cpf}</strong>, participou do treinamento
+          ${summary ? `<p>${summary}</p>` : `<p>
+            CPF: <strong>${cpf}</strong>, participou do treinamento
             de <strong>${courseName}</strong>, no dia <strong>${date.toLocaleDateString('pt-BR')}</strong>, com
             carga horária de <strong>${hours}h</strong>, conforme <strong>NR</strong>
             <strong>NR 23, NBR 14.276/2020 e NT-17 CBMMA</strong>, tendo seu o aproveitamento satisfatório.
-          </p>
+          </p>`}
+          
         </div>
       </div>
 
@@ -343,6 +353,7 @@ export function generateCertificateHTML(data: CertificateTemplateData): string {
         <div class="signature">
           <img src="${seloSrc}" class="seal" alt="Selo Best Quality" />
           <div>
+            <img class="signature-img" src="${assinatura1Src}" alt="Assinatura" />
             <div class="line"></div>
             <strong>COORDENADOR RESPONSÁVEL</strong>
             Rodrigo Márcio Silva de Oliveira<br />
@@ -352,6 +363,7 @@ export function generateCertificateHTML(data: CertificateTemplateData): string {
         </div>
         <div class="signature">
           <div>
+            <img class="signature-img" src="${assinatura2Src}" alt="Assinatura" />
             <div class="line"></div>
             <strong>INSTRUTOR PCI E APH</strong>
             Lourival Taveira Lobão Neto<br />

@@ -6,6 +6,7 @@ export const CertificateDraftSchema = z.object({
   cpf: z.string(),
   completionDate: z.string(),
   workload: z.number(),
+  summary: z.string().optional(),
 });
 
 export type CertificateDraftSchemaDTO = z.infer<typeof CertificateDraftSchema>;

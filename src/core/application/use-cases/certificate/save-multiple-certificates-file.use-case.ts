@@ -52,7 +52,7 @@ export class SaveMultipleCertificatesFileUseCase {
 
     const certificates: Certificate[] = [];
 
-    for (const certData of draftCertificates) {
+    for (const certificateDraft of draftCertificates) {
 
       const lastCertificate = await this.certificateRepo.lastCreated();
       let registrationNumber: RegistrationNumber;
@@ -69,18 +69,18 @@ export class SaveMultipleCertificatesFileUseCase {
 
       const newCert = new Certificate({
         id: randomUUID(),
-        completionDate: certData.completionDate,
-        courseName: certData.courseName,
-        cpf: certData.cpf,
+        completionDate: certificateDraft.completionDate,
+        courseName: certificateDraft.courseName,
+        cpf: certificateDraft.cpf,
         createdAt: new Date(),
-        studentName: certData.studentName,
-        workload: certData.workload,
+        studentName: certificateDraft.studentName,
+        workload: certificateDraft.workload,
         registrationNumber,
         page,
         ptsBook: new PTSBook('001/' + currentYear),
       });
 
-      const buffer = await this.fileGenerator.generate(newCert);
+      const buffer = await this.fileGenerator.generate(newCert, certificateDraft);
       const fileURL = await this.storageFile.storage(buffer);
 
       newCert.changeFileURL(fileURL);

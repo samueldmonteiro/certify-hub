@@ -321,7 +321,7 @@ export default function CertificatesPage() {
                         <TableCell>
                           <Checkbox
                             checked={selectedCertificates.includes(certificate.id)}
-                            onCheckedChange={(checked) =>
+                            onCheckedChange={(checked: boolean) =>
                               handleSelectCertificate(certificate.id, checked as boolean)
                             }
                           />
