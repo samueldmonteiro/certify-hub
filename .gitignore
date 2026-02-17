@@ -11,6 +11,8 @@
 !.yarn/versions
 /generated
 
+/public/tests
+
 # testing
 /coverage
 
