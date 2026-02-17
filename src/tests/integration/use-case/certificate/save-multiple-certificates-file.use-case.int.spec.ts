@@ -2,10 +2,10 @@ import { beforeEach, describe, it, expect } from 'vitest';
 import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { SaveMultipleCertificatesFileUseCase } from '@/src/core/application/use-cases/certificate/save-multiple-certificates-file.use-case';
-import { VercelStoragePDFCertificate } from '@/src/core/infra/storage/vercel-storage-pdf-certificate';
 import { PrismaCertificateRepository } from '@/src/core/infra/database/prisma/prisma-certificate.repository';
 import { PuppeteerPDFCertificateGenerator } from '@/src/core/infra/pdf/puppeteer-pdf-certificate-generator';
 import { prisma } from '@/src/lib/prisma';
+import { LocalStoragePDF } from '@/src/core/infra/storage/local.storage-pdf';
 
 let sut: SaveMultipleCertificatesFileUseCase;
 
@@ -13,7 +13,7 @@ beforeEach(async () => {
 
   sut = new SaveMultipleCertificatesFileUseCase(
     new PuppeteerPDFCertificateGenerator(),
-    new VercelStoragePDFCertificate(),
+    new LocalStoragePDF(),
     new PrismaCertificateRepository(),
   );
 
@@ -44,8 +44,8 @@ describe('SaveMultipleCertificatesFileUseCase (Int)', () => {
     expect(response.certificates[0].fileURL).toMatch(/^https?:\/\//);
     expect(response.certificates[1].fileURL).toMatch(/^https?:\/\//);
 
-    expect(response.certificates[0].fileURL).toContain('vercel');
-    expect(response.certificates[1].fileURL).toContain('vercel');
+    expect(response.certificates[0].fileURL).toContain('http');
+    expect(response.certificates[1].fileURL).toContain('http');
 
     expect(response.certificates[0].courseName).toBe('Course 1');
     expect(response.certificates[1].courseName).toBe('Course 2');
