@@ -50,23 +50,29 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
         const rowNum = index + 2; // +2 porque começa do 1 e tem o header
 
         console.log('JOSN DATA', jsonData);
-        if (!row.Nome || typeof row.Nome !== 'string') {
+        if (!row.NOME_ALUNO || typeof row.NOME_ALUNO !== 'string') {
           errors.push(`Linha ${rowNum}: Nome inválido ou ausente`);
         }
         if (!row.CPF || !validateCPF(String(row.CPF))) {
           errors.push(`Linha ${rowNum}: CPF inválido ou ausente`);
         }
-        if (!row.DATA || !validateDate(String(row.DATA))) {
+
+        if (!row.DURACAO_CURSO_HRS) {
+          errors.push(`Linha ${rowNum}: Duração inválida ou ausente`);
+        }
+
+        if (!row.DATA_CONCLUSAO || !validateDate(String(row.DATA_CONCLUSAO))) {
           errors.push(`Linha ${rowNum}: Data inválida (use formato YYYY-MM-DD ou DD/MM/YYYY)`);
         }
 
-        if (row.Nome && row.CPF && row.DATA) {
+        if (row.NOME_ALUNO && row.CPF && row.DATA_CONCLUSAO) {
           students.push({
-            studentName: row.Nome,
+            studentName: row.NOME_ALUNO,
             cpf: new CPF(String(row.CPF)),
-            completionDate: new Date(row.DATA),
-            workload: 8,
+            completionDate: new Date(row.DATA_CONCLUSAO),
+            workload: Number(row.DURACAO_CURSO_HRS) || 8,
             courseName: 'Brigada de Incêncio e Emergência',
+            summary: row.MENSAGEM_PERSONALIZADA || undefined,
           });
         }
       });
@@ -111,8 +117,7 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
       <CardContent className="pt-6">
         <div className="space-y-4">
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isLoading ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary'
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isLoading ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary'}`}
             onClick={!isLoading ? handleClick : undefined}
           >
             <input

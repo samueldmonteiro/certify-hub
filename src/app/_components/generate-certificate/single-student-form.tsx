@@ -18,6 +18,9 @@ export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStud
     studentName: '',
     cpf: '',
     completionDate: '',
+    courseName: 'Brigada de Incêndio e Emergência',
+    workload: '8',
+    summary: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,9 +28,10 @@ export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStud
     onSubmit({
       cpf: new CPF(formData.cpf),
       studentName: formData.studentName,
-      courseName: 'Brigada de Incêncio e Emergência',
-      workload: 8,
+      courseName: formData.courseName,
+      workload: Number(formData.workload),
       completionDate: new Date(formData.completionDate),
+      summary: formData.summary || undefined,
     });
   };
 
@@ -60,28 +64,71 @@ export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStud
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cpf">CPF</Label>
-            <Input
-              id="cpf"
-              name="cpf"
-              value={formData.cpf}
-              onChange={handleChange}
-              placeholder="000.000.000-00"
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cpf">CPF</Label>
+              <Input
+                id="cpf"
+                name="cpf"
+                value={formData.cpf}
+                onChange={handleChange}
+                placeholder="000.000.000-00"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="completionDate">Data de Conclusão</Label>
+              <Input
+                id="completionDate"
+                name="completionDate"
+                type="date"
+                value={formData.completionDate}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-3 space-y-2">
+              <Label htmlFor="courseName">Nome do Curso</Label>
+              <Input
+                id="courseName"
+                name="courseName"
+                value={formData.courseName}
+                onChange={handleChange}
+                placeholder="Nome do Curso"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="workload">Carga Horária (horas)</Label>
+              <Input
+                id="workload"
+                name="workload"
+                type="number"
+                min="1"
+                value={formData.workload}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="completionDate">Data de Conclusão</Label>
+            <Label htmlFor="summary">Mensagem Personalizada (Opcional)</Label>
             <Input
-              id="completionDate"
-              name="completionDate"
-              type="date"
-              value={formData.completionDate}
+              id="summary"
+              name="summary"
+              value={formData.summary}
               onChange={handleChange}
-              required
+              placeholder="Ex: Treinamento realizado em conformidade com a NR-23"
             />
+            <p className="text-xs text-muted-foreground">
+              Esta mensagem aparecerá no corpo do certificado. Deixe em branco para usar o padrão.
+            </p>
           </div>
 
           <Button type="submit" className="w-full" disabled={isGenerating}>

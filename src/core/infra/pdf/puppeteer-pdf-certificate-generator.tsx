@@ -1,13 +1,14 @@
 import { FileCertificateGenerator } from '../../domain/services/file-certificate-generator';
 import puppeteer from 'puppeteer';
 import { FailFileCertificateGeneratorError } from '../../domain/errors/fail-file-certificate-generate.error';
-import { generateCertificateHTML } from '@/src/app/certificado/client';
+import { generateCertificateHTML } from '@/src/app/certificado/certificate-template';
 import fs from 'fs';
 import path from 'path';
 import { Certificate } from '../../domain/entities/certificate.entity';
+import { CertificateDraft } from '../../domain/value-objects/certificate-draft.value-object';
 
 export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerator {
-  async generate(data: Certificate): Promise<Buffer> {
+  async generate(data: Certificate, draft: CertificateDraft): Promise<Buffer> {
     let browser;
 
     try {
@@ -33,6 +34,7 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
         registrationNumber: data?.registrationNumber?.getValue() ?? '0001/2026',
         page: data?.page?.getValue() ?? '001/2026',
         ptsBook: data?.ptsBook?.getValue() ?? '001/2026',
+        summary: draft.summary,
       });
 
       // Lançar navegador

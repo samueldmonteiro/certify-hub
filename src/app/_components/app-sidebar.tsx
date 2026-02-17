@@ -28,13 +28,7 @@ export const data = {
     {
       title: 'Emitir Certificado',
       icon: FilePlus,
-      isActive: true,
-      items: [
-        {
-          title: 'Curso - Brigada de Incêndio e Emergência',
-          url: '/dashboard/certificados/emitir',
-        },
-      ],
+      url: '/dashboard/certificados/emitir',
     },
     {
       title: 'Certificados Emitidos',
