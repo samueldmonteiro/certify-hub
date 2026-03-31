@@ -10,13 +10,13 @@ export interface CertificateTemplateProps {
   registrationNumber: string;
   page: string;
   ptsBook: string;
-  summary?: string;
+  message?: string;
   assinatura1Src: string;
   assinatura2Src: string;
 }
 
 export function generateCertificateHTML(data: CertificateTemplateProps): string {
-  const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc, registrationNumber, page, ptsBook, summary, assinatura1Src, assinatura2Src } = data;
+  const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc, registrationNumber, page, ptsBook, message, assinatura1Src, assinatura2Src } = data;
 
   return `<!DOCTYPE html>
 <html>
@@ -339,7 +339,7 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
         <p class="student-name">${studentName}</p>
         <div class="divider"></div>
         <div class="description">
-          ${summary ? `<p>${summary}</p>` : `<p>
+          ${message ? `<p>${message}</p>` : `<p>
             CPF: <strong>${cpf}</strong>, participou do treinamento
             de <strong>${courseName}</strong>, no dia <strong>${date.toLocaleDateString('pt-BR')}</strong>, com
             carga horária de <strong>${hours}h</strong>, conforme <strong>NR</strong>

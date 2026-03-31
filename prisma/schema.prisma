@@ -24,10 +24,22 @@ model Certificate {
   workload           Int
   completionDate     DateTime
   page               String
+  message            String?
   registrationNumber String   @unique
   ptsBook            String
-  fileURL            String?
   createdAt          DateTime @default(now())
 
   @@map("certificates")
+}
+
+/// Stores the ever-increasing sequence counter for registration numbers.
+/// Page is derived from lastRegistrationIndex (ceil(n/50)).
+/// PTSBook is always fixed as 001/currentYear.
+/// Never decremented when certificates are deleted.
+model CertificateSequence {
+  id                    String @id @default("singleton")
+  lastRegistrationIndex Int    @default(0)
+  year                  Int
+
+  @@map("certificate_sequences")
 }

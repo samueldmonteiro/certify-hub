@@ -18,14 +18,55 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
   const [fileName, setFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateCPF = (cpf: string): boolean => {
-    const cleanCPF = cpf.replace(/[^\d]/g, '');
-    return cleanCPF.length === 11;
+  const parseBrDate = (dateStr: string): Date | null => {
+    if (!dateStr) return null;
+    const date = String(dateStr).trim();
+
+    // DD/MM/YYYY ou DD/MM/YY
+    const brRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/;
+    const match = date.match(brRegex);
+    if (match) {
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1; // 0-based
+      let year = parseInt(match[3], 10);
+      if (year < 100) year += 2000;
+
+      // Usa o construtor com componentes para evitar ambiguidade de fuso
+      const d = new Date(year, month, day);
+      if (d.getDate() === day && d.getMonth() === month && d.getFullYear() === year) {
+        return d;
+      }
+      return null;
+    }
+
+    // YYYY-MM-DD (ISO) — parseado manualmente para evitar UTC vs local
+    const isoRegex = /^(\d{4})-(\d{2})-(\d{2})$/;
+    const isoMatch = date.match(isoRegex);
+    if (isoMatch) {
+      const year = parseInt(isoMatch[1], 10);
+      const month = parseInt(isoMatch[2], 10) - 1; // 0-based
+      const day = parseInt(isoMatch[3], 10);
+      const d = new Date(year, month, day);
+      if (d.getDate() === day && d.getMonth() === month && d.getFullYear() === year) {
+        return d;
+      }
+      return null;
+    }
+
+    // Fallback: número serial do Excel (caso XLSX entregue como string numérica)
+    const serial = Number(date);
+    if (!isNaN(serial) && serial > 1) {
+      // Epoch do Excel: 1 = 1900-01-01, com o bug do dia 29/02/1900
+      const excelEpoch = new Date(1899, 11, 30);
+      const d = new Date(excelEpoch.getTime() + serial * 86400000);
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    return null;
   };
 
   const validateDate = (date: string): boolean => {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$|^\d{2}\/\d{2}\/\d{4}$/;
-    return dateRegex.test(date);
+    return parseBrDate(date) !== null;
   };
 
   const processFile = async (file: File) => {
@@ -35,11 +76,11 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
 
     try {
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
+      const workbook = XLSX.read(data, { cellDates: false }); // lê datas como raw para controlarmos o parse
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, {
         raw: false,
-        dateNF: 'yyyy-mm-dd',
+        dateNF: 'dd/mm/yyyy',
       });
 
       // Validação dos dados
@@ -48,37 +89,50 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
 
       jsonData.forEach((row: any, index: number) => {
         const rowNum = index + 2; // +2 porque começa do 1 e tem o header
+        const rowErrors: string[] = [];
 
-        console.log('JOSN DATA', jsonData);
-        if (!row.NOME_ALUNO || typeof row.NOME_ALUNO !== 'string') {
-          errors.push(`Linha ${rowNum}: Nome inválido ou ausente`);
-        }
-        if (!row.CPF || !validateCPF(String(row.CPF))) {
-          errors.push(`Linha ${rowNum}: CPF inválido ou ausente`);
+        // 1. Validar Nome
+        if (!row.NOME_ALUNO || String(row.NOME_ALUNO).trim().length < 2) {
+          rowErrors.push('Nome ausente ou curto demais');
         }
 
-        if (!row.DURACAO_CURSO_HRS) {
-          errors.push(`Linha ${rowNum}: Duração inválida ou ausente`);
+        // 2. Validar CPF
+        const cpfStr = String(row.CPF || '').replace(/[^\d]/g, '');
+        if (!cpfStr || cpfStr.length !== 11) {
+          rowErrors.push(`CPF inválido (deve ter 11 dígitos): '${row.CPF || ''}'`);
         }
 
-        if (!row.DATA_CONCLUSAO || !validateDate(String(row.DATA_CONCLUSAO))) {
-          errors.push(`Linha ${rowNum}: Data inválida (use formato YYYY-MM-DD ou DD/MM/YYYY)`);
+        // 3. Validar Duração
+        const workload = Number(row.DURACAO_CURSO_HRS);
+        if (!row.DURACAO_CURSO_HRS || isNaN(workload) || workload <= 0) {
+          rowErrors.push(`Duração/Workload inválida: '${row.DURACAO_CURSO_HRS || ''}'`);
         }
 
-        if (row.NOME_ALUNO && row.CPF && row.DATA_CONCLUSAO) {
+        // 4. Validar Data
+        const dateStr = String(row.DATA_CONCLUSAO || '').trim();
+        const parsedDate = parseBrDate(dateStr);
+        console.log(dateStr, parsedDate);
+        if (!dateStr || !parsedDate) {
+          rowErrors.push(`Data inválida: '${dateStr}' (formato esperado: DD/MM/YY ou DD/MM/YYYY)`);
+        }
+
+        if (rowErrors.length > 0) {
+          errors.push(`Linha ${rowNum}: ${rowErrors.join(', ')}`);
+        } else {
+          // Se não houver erros na linha, adiciona ao array de sucesso
           students.push({
-            studentName: row.NOME_ALUNO,
-            cpf: new CPF(String(row.CPF)),
-            completionDate: new Date(row.DATA_CONCLUSAO),
-            workload: Number(row.DURACAO_CURSO_HRS) || 8,
+            studentName: String(row.NOME_ALUNO).trim(),
+            cpf: new CPF(cpfStr),
+            completionDate: parsedDate!,
+            workload: workload,
             courseName: 'Brigada de Incêncio e Emergência',
-            summary: row.MENSAGEM_PERSONALIZADA || undefined,
+            message: row.MENSAGEM_PERSONALIZADA ? String(row.MENSAGEM_PERSONALIZADA).trim() : undefined,
           });
         }
       });
 
       if (errors.length > 0) {
-        setError(errors.join('\n'));
+        setError(`Foram encontrados erros na planilha:\n\n${errors.slice(0, 15).join('\n')}${errors.length > 15 ? `\n... e mais ${errors.length - 15} erros.` : ''}`);
         setIsLoading(false);
         return;
       }
@@ -114,40 +168,40 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
 
   return (
     <Card>
-      <CardContent className="pt-6">
-        <div className="space-y-4">
+      <CardContent className='pt-6'>
+        <div className='space-y-4'>
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isLoading ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary'}`}
             onClick={!isLoading ? handleClick : undefined}
           >
             <input
               ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls"
+              type='file'
+              accept='.xlsx,.xls'
               onChange={handleFileChange}
-              className="hidden"
+              className='hidden'
               disabled={isLoading}
             />
 
             {isLoading ? (
-              <div className="space-y-3">
-                <div className="animate-spin mx-auto h-12 w-12 border-4 border-primary border-t-transparent rounded-full" />
-                <p className="text-sm text-muted-foreground">Processando arquivo...</p>
+              <div className='space-y-3'>
+                <div className='animate-spin mx-auto h-12 w-12 border-4 border-primary border-t-transparent rounded-full' />
+                <p className='text-sm text-muted-foreground'>Processando arquivo...</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="mx-auto h-12 w-12 text-muted-foreground">
+              <div className='space-y-3'>
+                <div className='mx-auto h-12 w-12 text-muted-foreground'>
                   {fileName ? (
-                    <FileSpreadsheet className="h-full w-full" />
+                    <FileSpreadsheet className='h-full w-full' />
                   ) : (
-                    <Upload className="h-full w-full" />
+                    <Upload className='h-full w-full' />
                   )}
                 </div>
                 <div>
-                  <p className="text-sm font-medium">
+                  <p className='text-sm font-medium'>
                     {fileName || 'Clique para selecionar ou arraste um arquivo'}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className='text-xs text-muted-foreground mt-1'>
                     Arquivo Excel (.xlsx, .xls) com colunas: nome, cpf, completionDate
                   </p>
                 </div>
@@ -156,9 +210,9 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
           </div>
 
           {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="whitespace-pre-line">{error}</AlertDescription>
+            <Alert variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertDescription className='whitespace-pre-line'>{error}</AlertDescription>
             </Alert>
           )}
         </div>
@@ -166,4 +220,3 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
     </Card>
   );
 }
-

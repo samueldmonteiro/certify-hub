@@ -40,7 +40,7 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
         registrationNumber: data?.registrationNumber?.getValue() ?? '0001/2026',
         page: data?.page?.getValue() ?? '001/2026',
         ptsBook: data?.ptsBook?.getValue() ?? '001/2026',
-        summary: draft.summary,
+        message: draft.message,
         assinatura1Src: assinatura1Base64,
         assinatura2Src: assinatura2Base64,
       });

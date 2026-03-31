@@ -18,7 +18,6 @@ export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerat
       const logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
       const seloBase64 = `data:image/png;base64,${seloBuffer.toString('base64')}`;
 
-
       const assinatura1Buffer = fs.readFileSync(path.join(process.cwd(), 'src/app/assets/assinatura_1.png'));
       const assinatura2Buffer = fs.readFileSync(path.join(process.cwd(), 'src/app/assets/assinatura_2.png'));
 
@@ -36,7 +35,7 @@ export class PlaywrightPDFCertificateGenerator implements FileCertificateGenerat
         page: data?.page?.getValue() ?? '001/2026',
         ptsBook: data?.ptsBook?.getValue() ?? '001/2026',
         studentName: data.studentName,
-        summary: draft.summary,
+        message: draft.message,
         assinatura1Src: assinatura1Base64,
         assinatura2Src: assinatura2Base64,
       });

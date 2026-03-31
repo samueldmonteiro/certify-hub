@@ -18,7 +18,7 @@ const makeProps = () => ({
   registrationNumber: new RegistrationNumber('0001/2024'),
   ptsBook: new PTSBook('001/2024'),
   createdAt: new Date(),
-  fileURL: 'http://test.com/file.pdf',
+  message: 'Mensagem de teste',
 });
 
 describe('Certificate entity (unit)', () => {
@@ -35,7 +35,7 @@ describe('Certificate entity (unit)', () => {
     expect(c.page).toBe(props.page);
     expect(c.registrationNumber).toBe(props.registrationNumber);
     expect(c.ptsBook).toBe(props.ptsBook);
-    expect(c.fileURL).toBe(props.fileURL);
+    expect(c.message).toBe(props.message);
   });
 
   it('should validate constructor fields', () => {

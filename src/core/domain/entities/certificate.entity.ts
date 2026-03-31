@@ -15,7 +15,7 @@ export interface CertificateProps {
   registrationNumber: RegistrationNumber,
   ptsBook: PTSBook,
   createdAt: Date,
-  fileURL?: string
+  message?: string
 }
 
 export class Certificate {
@@ -80,8 +80,8 @@ export class Certificate {
     return this.props.createdAt;
   }
 
-  get fileURL(): string | undefined {
-    return this.props.fileURL;
+  get message(): string | undefined {
+    return this.props.message;
   }
 
   getCPFFormatted(): string {
@@ -130,7 +130,7 @@ export class Certificate {
     this.props.ptsBook = newPts;
   }
 
-  changeFileURL(newFileURL: string): void {
-    this.props.fileURL = newFileURL;
+  changeMessage(newMessage: string | undefined): void {
+    this.props.message = newMessage;
   }
 }

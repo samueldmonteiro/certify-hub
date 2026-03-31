@@ -6,5 +6,6 @@ export interface CertificateDraft {
   completionDate: Date;
   courseName: string;
   workload: number;
-  summary?: string
+  /** Mensagem personalizada que sobrescreve o texto padrão do template */
+  message?: string;
 }

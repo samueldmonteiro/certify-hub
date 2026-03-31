@@ -2,12 +2,12 @@ import { CertificatePresenter } from '@/src/core/application/presenters/certific
 import { CertificateViewModel } from '@/src/core/application/view-models/certificate.view-model';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
-import { makeSaveMultipleCertificatesFileUseCase } from '@/src/core/infra/factories/make-save-multiple-certificates-file.use-case.factory';
+import { makeRegisterCertificatesUseCase } from '@/src/core/infra/factories/make-register-certificates.use-case.factory';
 import { CertificateDraftArraySchema, CertificateDraftErrorsSchema, CertificateDraftSchemaDTO } from '@/src/core/infra/http/schemas/certificate-student-data.schema';
 import { NextResponse } from 'next/server';
 import z from 'zod';
 
-export interface GenerateCertificatesResponse {
+export interface RegisterCertificatesResponse {
   success: boolean,
   data?: CertificateViewModel[],
   errors?: CertificateDraftErrorsSchema
@@ -33,16 +33,17 @@ export async function POST(req: Request) {
       cpf: new CPF(d.cpf),
       studentName: d.studentName,
       workload: d.workload,
-      summary: d.summary,
+      message: d.message,
     });
   });
 
   try {
-    const saveFiles = await makeSaveMultipleCertificatesFileUseCase().execute(data);
+    console.log(data);
+    const result = await makeRegisterCertificatesUseCase().execute(data);
 
     return NextResponse.json({
       success: true,
-      data: CertificatePresenter.toManyViewModel(saveFiles.certificates),
+      data: CertificatePresenter.toManyViewModel(result.certificates),
     });
   } catch (error: any) {
     return NextResponse.json(
@@ -51,3 +52,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

@@ -1,7 +1,19 @@
 'use client';
 
 import { useActionState, useEffect, useState, startTransition } from 'react';
-import { Search, FileText, Download, ChevronLeft, ChevronRight, Trash2, MoreVertical, X } from 'lucide-react';
+import {
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  Trash2,
+  MoreVertical,
+  X,
+  Loader2,
+  Package,
+  Edit,
+  Eye,
+} from 'lucide-react';
 import { Input } from '@/src/app/_components/ui/input';
 import { Button } from '@/src/app/_components/ui/button';
 import {
@@ -37,7 +49,13 @@ import {
 } from '@/src/app/_components/ui/alert-dialog';
 import { Checkbox } from '@/src/app/_components/ui/checkbox';
 import { searchCertificatesAction } from '../../_actions/search-certificates.action';
-import { deleteCertificateAction, deleteManyCertificatesAction } from '../../_actions/certificate/delete-certificate.action';
+import {
+  deleteCertificateAction,
+  deleteManyCertificatesAction,
+} from '../../_actions/certificate/delete-certificate.action';
+import { updateCertificateAction } from '../../_actions/certificate/update-certificate.action';
+import { UpdateCertificateModal } from '../../_components/generate-certificate/update-certificate-modal';
+import { ViewCertificateModal } from '../../_components/generate-certificate/view-certificate-modal';
 
 export default function CertificatesPage() {
   const [filters, setFilters] = useState({
@@ -53,7 +71,19 @@ export default function CertificatesPage() {
   const [deleteSingleModalOpen, setDeleteSingleModalOpen] = useState(false);
   const [certificateToDelete, setCertificateToDelete] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteMessage, setDeleteMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [deleteMessage, setDeleteMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
+
+  // Download state
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [isBatchDownloading, setIsBatchDownloading] = useState(false);
+
+  // Modal states for view/update
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedCertificateData, setSelectedCertificateData] = useState<any | null>(null);
 
   const [state, formAction, isPending] = useActionState(searchCertificatesAction, {
     success: false,
@@ -62,20 +92,14 @@ export default function CertificatesPage() {
   });
 
   useEffect(() => {
-    const formData = new FormData();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) formData.append(key, value.toString());
-    });
     startTransition(() => {
       formAction(filters);
     });
-  }, [filters, filters.page, formAction]);
+  }, [filters, formAction]);
 
   useEffect(() => {
     if (deleteMessage) {
-      const timer = setTimeout(() => {
-        setDeleteMessage(null);
-      }, 5000);
+      const timer = setTimeout(() => setDeleteMessage(null), 5000);
       return () => clearTimeout(timer);
     }
   }, [deleteMessage]);
@@ -83,12 +107,8 @@ export default function CertificatesPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setFilters({ ...filters, page: 1 });
-    const formData = new FormData();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) formData.append(key, value.toString());
-    });
     startTransition(() => {
-      formAction(filters);
+      formAction({ ...filters, page: 1 });
     });
   };
 
@@ -118,68 +138,110 @@ export default function CertificatesPage() {
 
   const handleDeleteMultiple = async () => {
     setDeleteLoading(true);
-
     const { success } = await deleteManyCertificatesAction(selectedCertificates);
-
     if (success) {
       setDeleteMessage({
         type: 'success',
         text: `${selectedCertificates.length} certificado(s) deletado(s) com sucesso!`,
       });
       setSelectedCertificates([]);
-
-      startTransition(() => {
-        formAction(filters);
-      });
+      startTransition(() => formAction(filters));
     } else {
-      setDeleteMessage({
-        type: 'error',
-        text: 'Erro ao deletar certificados. Tente novamente.',
-      });
+      setDeleteMessage({ type: 'error', text: 'Erro ao deletar certificados. Tente novamente.' });
     }
-
     setDeleteLoading(false);
     setDeleteModalOpen(false);
   };
 
   const handleDeleteSingle = async () => {
     if (!certificateToDelete) return;
-
     setDeleteLoading(true);
-
     const { success } = await deleteCertificateAction(certificateToDelete);
-
     if (success) {
-      setDeleteMessage({
-        type: 'success',
-        text: 'Certificado deletado com sucesso!',
-      });
-
-      startTransition(() => {
-        formAction(filters);
-      });
+      setDeleteMessage({ type: 'success', text: 'Certificado deletado com sucesso!' });
+      startTransition(() => formAction(filters));
     } else {
-      setDeleteMessage({
-        type: 'error',
-        text: 'Erro ao deletar certificado. Tente novamente.',
-      });
+      setDeleteMessage({ type: 'error', text: 'Erro ao deletar certificado. Tente novamente.' });
     }
-
     setDeleteLoading(false);
     setDeleteSingleModalOpen(false);
     setCertificateToDelete(null);
   };
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('pt-BR');
+  const handleUpdate = async (id: string, data: any) => {
+    const result = await updateCertificateAction(id, data);
+    if (result.success) {
+      setDeleteMessage({ type: 'success', text: result.message });
+      startTransition(() => formAction(filters));
+    } else {
+      setDeleteMessage({ type: 'error', text: result.message });
+    }
   };
 
-  const formatCPF = (cpf: string) => {
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  /** Download individual — gera PDF on-demand */
+  const handleDownloadSingle = async (certificateId: string, studentName: string) => {
+    setDownloadingId(certificateId);
+    try {
+      const res = await fetch(`/api/certificates/${certificateId}/download`);
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Erro ao gerar PDF');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `certificado_${studentName.replace(/\s+/g, '_')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error: any) {
+      setDeleteMessage({ type: 'error', text: error.message || 'Erro ao baixar certificado.' });
+    } finally {
+      setDownloadingId(null);
+    }
   };
+
+  /** Download em lote — gera ZIP on-demand */
+  const handleBatchDownload = async () => {
+    if (selectedCertificates.length === 0) return;
+    setIsBatchDownloading(true);
+    try {
+      const res = await fetch('/api/certificates/batch-download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedCertificates }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Erro ao gerar ZIP');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `certificados_${Date.now()}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error: any) {
+      setDeleteMessage({ type: 'error', text: error.message || 'Erro ao baixar certificados.' });
+    } finally {
+      setIsBatchDownloading(false);
+    }
+  };
+
+  const formatDate = (date: Date) => new Date(date).toLocaleDateString('pt-BR');
+  const formatCPF = (cpf: string) =>
+    cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 
   const totalPages = state.data ? Math.ceil(state.data.total / state.data.perPage) : 0;
-  const allSelected = state.data && selectedCertificates.length === state.data.items.length && state.data.items.length > 0;
+  const allSelected =
+    state.data &&
+    selectedCertificates.length === state.data.items.length &&
+    state.data.items.length > 0;
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -187,10 +249,11 @@ export default function CertificatesPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Certificados</CardTitle>
           <CardDescription>
-            Gerencie e visualize todos os certificados emitidos
+            Gerencie e baixe os certificados cadastrados no sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Filtros */}
           <div className="space-y-4 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
@@ -201,7 +264,7 @@ export default function CertificatesPage() {
                   id="studentName"
                   placeholder="Digite o nome do aluno"
                   value={filters.studentName}
-                  onChange={(e) => handleFilterChange('studentName', e.target.value)}
+                  onChange={e => handleFilterChange('studentName', e.target.value)}
                 />
               </div>
 
@@ -213,7 +276,7 @@ export default function CertificatesPage() {
                   id="cpf"
                   placeholder="000.000.000-00"
                   value={filters.cpf}
-                  onChange={(e) => handleFilterChange('cpf', e.target.value)}
+                  onChange={e => handleFilterChange('cpf', e.target.value)}
                 />
               </div>
 
@@ -225,7 +288,7 @@ export default function CertificatesPage() {
                   id="courseName"
                   placeholder="Digite o nome do curso"
                   value={filters.courseName}
-                  onChange={(e) => handleFilterChange('courseName', e.target.value)}
+                  onChange={e => handleFilterChange('courseName', e.target.value)}
                 />
               </div>
             </div>
@@ -237,30 +300,32 @@ export default function CertificatesPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => {
+                onClick={() =>
                   setFilters({
                     studentName: '',
                     cpf: '',
                     courseName: '',
                     page: 1,
                     perPage: 10,
-                  });
-                }}
+                  })
+                }
               >
                 Limpar Filtros
               </Button>
             </div>
           </div>
 
+          {/* Mensagens de feedback */}
           {deleteMessage && (
-            <div className={`${deleteMessage.type === 'success'
-              ? 'bg-green-50 border-green-200 text-green-800'
-              : 'bg-red-50 border-red-200 text-red-800'} border px-4 py-3 rounded mb-4 flex items-center justify-between`}>
+            <div
+              className={`${
+                deleteMessage.type === 'success'
+                  ? 'bg-green-50 border-green-200 text-green-800'
+                  : 'bg-red-50 border-red-200 text-red-800'
+              } border px-4 py-3 rounded mb-4 flex items-center justify-between`}
+            >
               <span>{deleteMessage.text}</span>
-              <button
-                onClick={() => setDeleteMessage(null)}
-                className="text-current hover:opacity-70"
-              >
+              <button onClick={() => setDeleteMessage(null)} className="text-current hover:opacity-70">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -272,19 +337,35 @@ export default function CertificatesPage() {
             </div>
           )}
 
+          {/* Barra de ações de seleção */}
           {selectedCertificates.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded mb-4 flex items-center justify-between">
+            <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded mb-4 flex items-center justify-between flex-wrap gap-2">
               <span className="text-blue-800 text-sm font-medium">
                 {selectedCertificates.length} certificado(s) selecionado(s)
               </span>
-              <Button
-                className='text-white bg-red-500 hover:bg-red-600'
-                size="sm"
-                onClick={() => setDeleteModalOpen(true)}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Deletar Selecionados
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={handleBatchDownload}
+                  disabled={isBatchDownloading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isBatchDownloading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Package className="w-4 h-4 mr-2" />
+                  )}
+                  {isBatchDownloading ? 'Gerando Certificados...' : 'Baixar Certificados'}
+                </Button>
+                <Button
+                  className="text-white bg-red-500 hover:bg-red-600"
+                  size="sm"
+                  onClick={() => setDeleteModalOpen(true)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Deletar Selecionados
+                </Button>
+              </div>
             </div>
           )}
 
@@ -302,7 +383,7 @@ export default function CertificatesPage() {
                     <TableRow>
                       <TableHead className="w-12">
                         <Checkbox
-                          checked={allSelected}
+                          checked={!!allSelected}
                           onCheckedChange={handleSelectAll}
                         />
                       </TableHead>
@@ -326,9 +407,7 @@ export default function CertificatesPage() {
                             }
                           />
                         </TableCell>
-                        <TableCell className="font-medium">
-                          {certificate.studentName}
-                        </TableCell>
+                        <TableCell className="font-medium">{certificate.studentName}</TableCell>
                         <TableCell>{formatCPF(certificate.cpf)}</TableCell>
                         <TableCell>{certificate.courseName}</TableCell>
                         <TableCell>{certificate.workload}h</TableCell>
@@ -338,22 +417,23 @@ export default function CertificatesPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
-                            {certificate.fileURL ? (
-                              <a
-                                href={certificate.fileURL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800"
-                              >
+                            {/* Download individual on-demand */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleDownloadSingle(certificate.id, certificate.studentName)
+                              }
+                              disabled={downloadingId === certificate.id}
+                              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                            >
+                              {downloadingId === certificate.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
                                 <Download className="w-4 h-4" />
-                                <span className="text-sm">Download</span>
-                              </a>
-                            ) : (
-                              <span className="text-sm text-gray-400 flex items-center gap-1">
-                                <FileText className="w-4 h-4" />
-                                Indisponível
-                              </span>
-                            )}
+                              )}
+                              <span className="ml-1 text-sm">PDF</span>
+                            </Button>
 
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -362,6 +442,26 @@ export default function CertificatesPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  className="cursor-pointer"
+                                  onClick={() => {
+                                    setSelectedCertificateData(certificate);
+                                    setViewModalOpen(true);
+                                  }}
+                                >
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  Visualizar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="cursor-pointer"
+                                  onClick={() => {
+                                    setSelectedCertificateData(certificate);
+                                    setUpdateModalOpen(true);
+                                  }}
+                                >
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  Editar
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="cursor-pointer text-red-600 focus:text-red-600"
                                   onClick={() => {
@@ -382,6 +482,7 @@ export default function CertificatesPage() {
                 </Table>
               </div>
 
+              {/* Paginação */}
               <div className="flex items-center justify-between mt-4">
                 <div className="text-sm text-gray-600">
                   Mostrando {(state.data.page - 1) * state.data.perPage + 1} a{' '}
@@ -412,7 +513,6 @@ export default function CertificatesPage() {
                       } else {
                         pageNum = state.data!.page - 2 + i;
                       }
-
                       return (
                         <Button
                           key={pageNum}
@@ -443,7 +543,7 @@ export default function CertificatesPage() {
         </CardContent>
       </Card>
 
-      {/* Modal de confirmação para deletar múltiplos */}
+      {/* Modal deletar múltiplos */}
       <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -466,7 +566,7 @@ export default function CertificatesPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Modal de confirmação para deletar um único certificado */}
+      {/* Modal deletar único */}
       <AlertDialog open={deleteSingleModalOpen} onOpenChange={setDeleteSingleModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -488,7 +588,27 @@ export default function CertificatesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modais de Exibição e Edição */}
+      <ViewCertificateModal
+        isOpen={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedCertificateData(null);
+        }}
+        certificate={selectedCertificateData}
+        onDownload={handleDownloadSingle}
+      />
+
+      <UpdateCertificateModal
+        isOpen={updateModalOpen}
+        onClose={() => {
+          setUpdateModalOpen(false);
+          setSelectedCertificateData(null);
+        }}
+        certificate={selectedCertificateData}
+        onUpdate={handleUpdate}
+      />
     </div>
   );
 }
-//485

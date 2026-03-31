@@ -10,17 +10,17 @@ import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
 
 interface SingleStudentFormProps {
   onSubmit: (student: CertificateDraft) => void;
-  isGenerating: boolean;
+  isRegistering: boolean;
 }
 
-export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStudentFormProps) {
+export default function SingleStudentForm({ onSubmit, isRegistering }: SingleStudentFormProps) {
   const [formData, setFormData] = useState({
     studentName: '',
     cpf: '',
     completionDate: '',
     courseName: 'Brigada de Incêndio e Emergência',
     workload: '8',
-    summary: '',
+    message: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,7 +31,7 @@ export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStud
       courseName: formData.courseName,
       workload: Number(formData.workload),
       completionDate: new Date(formData.completionDate),
-      summary: formData.summary || undefined,
+      message: formData.message || undefined,
     });
   };
 
@@ -45,9 +45,9 @@ export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStud
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Gerar Certificado Individual</CardTitle>
+        <CardTitle>Cadastrar Aluno Individual</CardTitle>
         <CardDescription>
-          Preencha os dados do aluno para gerar um certificado único
+          Preencha os dados do aluno para cadastrar um certificado único
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -118,11 +118,11 @@ export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStud
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="summary">Mensagem Personalizada (Opcional)</Label>
+            <Label htmlFor="message">Mensagem Personalizada (Opcional)</Label>
             <Input
-              id="summary"
-              name="summary"
-              value={formData.summary}
+              id="message"
+              name="message"
+              value={formData.message}
               onChange={handleChange}
               placeholder="Ex: Treinamento realizado em conformidade com a NR-23"
             />
@@ -131,14 +131,14 @@ export default function SingleStudentForm({ onSubmit, isGenerating }: SingleStud
             </p>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isGenerating}>
-            {isGenerating ? (
+          <Button type="submit" className="w-full" disabled={isRegistering}>
+            {isRegistering ? (
               <>
                 <div className="animate-spin mr-2 h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
-                Gerando...
+                Cadastrando...
               </>
             ) : (
-              'Gerar Certificado'
+              'Cadastrar Aluno'
             )}
           </Button>
         </form>

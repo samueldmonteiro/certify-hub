@@ -8,6 +8,6 @@ export type CertificateViewModel = {
   page: string,
   registrationNumber: string,
   ptsBook: string,
-  createdAt: Date
-  fileURL?: string
+  createdAt: Date,
+  message?: string
 };

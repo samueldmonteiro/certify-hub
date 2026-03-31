@@ -18,6 +18,7 @@ const certificateRepoMock: Mocked<ICertificateRepository> = {
   findById: vi.fn(),
   delete: vi.fn(),
   deleteMany: vi.fn(),
+  update: vi.fn(),
   lastCreated: vi.fn(),
 };
 

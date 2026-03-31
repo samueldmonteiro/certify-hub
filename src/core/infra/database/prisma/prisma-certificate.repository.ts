@@ -1,4 +1,5 @@
 import { Certificate } from '@/src/core/domain/entities/certificate.entity';
+import { CertificateSequence } from '@/src/core/domain/entities/certificate-sequence.entity';
 import {
   ICertificateRepository,
   CertificateSearchParams,
@@ -6,6 +7,7 @@ import {
 } from '@/src/core/domain/repositories/certificate.repository';
 import { prisma } from '@/src/lib/prisma';
 import { CertificateMapper } from './mappers/certificate.mapper';
+import { CertificateSequenceMapper } from './mappers/certificate-sequence.mapper';
 import { CertificateWhereInput } from '@/generated/prisma/models';
 
 export class PrismaCertificateRepository implements ICertificateRepository {
@@ -37,6 +39,32 @@ export class PrismaCertificateRepository implements ICertificateRepository {
     const certPrisma = CertificateMapper.toPrismaCreate(certificate);
     const created = await prisma.certificate.create({ data: certPrisma });
     return CertificateMapper.toDomain(created);
+  }
+
+  async createMany(certificates: Certificate[], sequence: CertificateSequence): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      // Usando create em loop para garantir que erros individuais
+      // estourem a transação e causem rollback de tudo
+      for (const cert of certificates) {
+        const data = CertificateMapper.toPrismaCreate(cert);
+        await tx.certificate.create({ data });
+      }
+
+      const sequencePrisma = CertificateSequenceMapper.toPrismaUpdate(sequence);
+      await tx.certificateSequence.update({
+        where: { id: sequence.id },
+        data: sequencePrisma,
+      });
+    });
+  }
+
+  async update(certificate: Certificate): Promise<Certificate> {
+    const certPrisma = CertificateMapper.toPrismaUpdate(certificate);
+    const updated = await prisma.certificate.update({
+      where: { id: certificate.id },
+      data: certPrisma,
+    });
+    return CertificateMapper.toDomain(updated);
   }
 
   async search(

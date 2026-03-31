@@ -25,9 +25,7 @@ export class CertificateMapper {
       ptsBook: new PTSBook(prismaCertificate.ptsBook),
       registrationNumber: new RegistrationNumber(prismaCertificate.registrationNumber),
       workload: prismaCertificate.workload,
-      fileURL: prismaCertificate.fileURL ?? undefined,
-      // Relacionamentos são mapeados apenas se existirem
-      //posts: prismaCertificate.posts?.map(post => PostMapper.toDomain(post)),
+      message: prismaCertificate.message ?? undefined,
     };
     return new Certificate(userProps);
   }
@@ -47,7 +45,7 @@ export class CertificateMapper {
       ptsBook: certificate.ptsBook.getValue(),
       studentName: certificate.studentName,
       workload: certificate.workload,
-      fileURL: certificate.fileURL ?? null,
+      message: certificate.message ?? null,
     };
   }
 
@@ -61,7 +59,7 @@ export class CertificateMapper {
       ptsBook: certificate.ptsBook.getValue(),
       studentName: certificate.studentName,
       workload: certificate.workload,
-      fileURL: certificate.fileURL ?? null,
+      message: certificate.message ?? null,
     };
   }
 }

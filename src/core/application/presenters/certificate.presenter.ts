@@ -14,7 +14,7 @@ export class CertificatePresenter {
       studentName: cert.studentName,
       workload: cert.workload,
       createdAt: cert.createdAt,
-      fileURL: cert.fileURL,
+      message: cert.message,
     };
   }
 
