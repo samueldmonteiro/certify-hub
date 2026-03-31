@@ -20,6 +20,7 @@ const certificateRepoMock: Mocked<ICertificateRepository> = {
   deleteMany: vi.fn(),
   update: vi.fn(),
   lastCreated: vi.fn(),
+  createMany: vi.fn(),
 };
 
 let sut: SearchCertificatesUseCase;

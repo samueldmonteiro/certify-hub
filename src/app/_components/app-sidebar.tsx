@@ -21,6 +21,7 @@ import Link from 'next/link';
 import {
   FilePlus,
   FileText,
+  Download,
 } from 'lucide-react';
 
 export const data = {
@@ -34,6 +35,11 @@ export const data = {
       title: 'Certificados Emitidos',
       url: '/dashboard/certificados',
       icon: FileText,
+    },
+    {
+      title: 'Baixar Planilha',
+      url: 'https://docs.google.com/spreadsheets/d/1qcLxyjrlclckcjvMcN6EquAPOO0G65Gs/export?format=xlsx',
+      icon: Download,
     },
   ],
 

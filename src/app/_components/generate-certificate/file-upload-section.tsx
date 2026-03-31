@@ -96,6 +96,10 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
           rowErrors.push('Nome ausente ou curto demais');
         }
 
+        if(!row.NOME_CURSO || String(row.NOME_CURSO).trim().length < 2) {
+          rowErrors.push('Nome do curso ausente ou curto demais');
+        }
+
         // 2. Validar CPF
         const cpfStr = String(row.CPF || '').replace(/[^\d]/g, '');
         if (!cpfStr || cpfStr.length !== 11) {
@@ -125,7 +129,7 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
             cpf: new CPF(cpfStr),
             completionDate: parsedDate!,
             workload: workload,
-            courseName: 'Brigada de Incêncio e Emergência',
+            courseName: String(row.NOME_CURSO).trim(),
             message: row.MENSAGEM_PERSONALIZADA ? String(row.MENSAGEM_PERSONALIZADA).trim() : undefined,
           });
         }

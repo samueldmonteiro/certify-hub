@@ -246,6 +246,7 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
 
       .back .content-left li {
         margin-bottom: -1px;
+        font-size:12px;
       }
 
       .back .content-right {
@@ -293,7 +294,7 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
         color: black;
         margin-bottom: 40px;
         position:relative;
-        right:-80px;
+        right:-70px;
         margin-top: 10px;
       }
 

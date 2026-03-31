@@ -4,7 +4,6 @@ import { RegisterCertificatesUseCase } from './register-certificates.use-case';
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { ICertificateRepository } from '@/src/core/domain/repositories/certificate.repository';
 import { ICertificateSequenceRepository } from '@/src/core/domain/repositories/certificate-sequence.repository';
-import { Certificate } from '@/src/core/domain/entities/certificate.entity';
 import { CertificateSequence } from '@/src/core/domain/entities/certificate-sequence.entity';
 
 const certificateRepositoryMock: Mocked<ICertificateRepository> = {
