@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   try {
     const { buffer, filename } = await makeGenerateCertificatesBatchUseCase().execute(parsed.data.ids);
 
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer.buffer as ArrayBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/zip',

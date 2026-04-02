@@ -10,7 +10,7 @@ export async function GET(
   try {
     const { buffer, filename } = await makeGenerateCertificatePDFUseCase().execute(id);
 
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer.buffer as ArrayBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
