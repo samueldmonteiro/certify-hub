@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "src/app/api/certificates/**": {
+      "maxDuration": 60
+    }
+  }
+}

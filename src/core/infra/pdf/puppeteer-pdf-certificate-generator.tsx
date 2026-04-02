@@ -1,5 +1,6 @@
 import { FileCertificateGenerator } from '../../domain/services/file-certificate-generator';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 import { FailFileCertificateGeneratorError } from '../../domain/errors/fail-file-certificate-generate.error';
 import { generateCertificateHTML } from '@/src/app/certificado/certificate-template';
 import fs from 'fs';
@@ -46,9 +47,12 @@ export class PuppeteerPDFCertificateGenerator implements FileCertificateGenerato
       });
 
       // Lançar navegador
+      const executablePath = process.env.CHROMIUM_PATH ?? await chromium.executablePath();
+
       browser = await puppeteer.launch({
+        args: chromium.args,
+        executablePath,
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
 
       const page = await browser.newPage();
