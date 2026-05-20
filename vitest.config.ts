@@ -9,8 +9,12 @@ export default defineConfig({
   },
 
   test: {
+    env: {
+      NODE_ENV: 'test',
+    },
     exclude: [
       'node_modules',
+      './src/actions/**',
       '.next',
       'out',
       '.vercel',
@@ -20,23 +24,44 @@ export default defineConfig({
       './src/app/**',
     ],
 
-    dir: '/src',
+    globals: true,
+    environment: 'node',
+
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      include: ['src/core/**/*.ts'],
+      exclude: ['src/**/*.spec.ts', 'src/**/*.it-spec.ts', 'src/generated/**'],
+    },
+
     projects: [
       {
         extends: true,
         test: {
           name: 'unit',
-          dir: 'src/core/',
+          include: ['src/**/*.spec.ts'],
         },
       },
 
       {
         extends: true,
         test: {
-          testTimeout: 15000,
+          name: 'e2e',
+          include: ['tests/**/*.e2e-spec.ts'],
+          setupFiles: ['./tests/setup.ts'],
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
+        },
+      },
+
+      {
+        extends: true,
+        test: {
           name: 'int',
-          dir: 'src/tests/integration',
-          environment: './prisma/vitest-env-prisma/prisma-test-env.ts',
+          include: ['tests/**/*.int-spec.ts'],
+          setupFiles: ['./tests/setup.ts'],
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
         },
       },
     ],

@@ -1,9 +1,8 @@
 'use server';
 
-import { UserPresenter } from '@/src/core/application/presenters/user.presenter';
-import { UserViewModel } from '@/src/core/application/view-models/user.view-model';
-import { makeLoginUseCase } from '@/src/core/infra/factories/make-login.use-case.factory';
-import { LoginErrorsSchema, LoginSchema } from '@/src/core/infra/http/schemas/login.schema';
+import { UserViewModel } from '@/src/core/entities/user.entity';
+import { authServiceFactory } from '@/src/core/factories/service.factory';
+import { LoginErrorsSchema, LoginSchema } from '@/src/core/validations/login.schema';
 import { createSession } from '@/src/lib/session';
 import z from 'zod';
 
@@ -27,13 +26,13 @@ export const loginAction = async (_prevState: any, formData: FormData): Promise<
   }
 
   try {
-    const response = await makeLoginUseCase().execute(parsed.data);
+    const response = await authServiceFactory().login(parsed.data);
     await createSession(response.user.id);
 
     return {
       success: true,
       data: {
-        user: UserPresenter.toViewModel(response.user),
+        user: response.user.toViewModel(),
       },
     };
 

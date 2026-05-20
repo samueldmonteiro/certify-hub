@@ -1,4 +1,4 @@
-import { makeGenerateCertificatePDFUseCase } from '@/src/core/infra/factories/make-generate-certificate-pdf.use-case.factory';
+import { certificateServiceFactory } from '@/src/core/factories/service.factory';
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const { buffer, filename } = await makeGenerateCertificatePDFUseCase().execute(id);
+    const { buffer, filename } = await certificateServiceFactory().generatePdf(id);
 
     return new NextResponse(buffer.buffer as ArrayBuffer, {
       status: 200,

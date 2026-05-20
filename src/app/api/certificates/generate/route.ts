@@ -3,7 +3,7 @@ import { CertificateViewModel } from '@/src/core/application/view-models/certifi
 import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
 import { makeRegisterCertificatesUseCase } from '@/src/core/infra/factories/make-register-certificates.use-case.factory';
-import { CertificateDraftArraySchema, CertificateDraftErrorsSchema, CertificateDraftSchemaDTO } from '@/src/core/infra/http/schemas/certificate-student-data.schema';
+import { CertificateDraftArraySchema, CertificateDraftErrorsSchema, CertificateDraftSchemaDTO } from '@/src/core/validations/certificate-student-data.schema';
 import { NextResponse } from 'next/server';
 import z from 'zod';
 

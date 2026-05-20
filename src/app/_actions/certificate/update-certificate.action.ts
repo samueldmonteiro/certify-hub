@@ -1,7 +1,7 @@
 'use server';
 
+import { certificateServiceFactory } from '@/src/core/factories/service.factory';
 import { revalidatePath } from 'next/cache';
-import { makeUpdateCertificateUseCase } from '@/src/core/infra/factories/make-update-certificate.use-case.factory';
 
 export async function updateCertificateAction(id: string, data: {
   studentName?: string;
@@ -10,21 +10,23 @@ export async function updateCertificateAction(id: string, data: {
   workload?: number;
   completionDate?: Date;
   message?: string;
+  page?: string;
+  ptsBook?: string;
+  registrationNumber?: string;
+
 }): Promise<{ success: boolean; message: string }> {
   try {
-    const useCase = makeUpdateCertificateUseCase();
 
-    // convert message empty string to undefined so it can clear? Or just let user keep it.
-    // If message is "", we might want to clear it, but let's just pass it as is.
-    
-    await useCase.execute({
+    await certificateServiceFactory().update({
       id,
       studentName: data.studentName,
       courseName: data.courseName,
       cpf: data.cpf,
       workload: data.workload,
       completionDate: data.completionDate,
-      message: data.message,
+      page: data.page,
+      ptsBook: data.ptsBook,
+      registrationNumber: data.registrationNumber,
     });
 
     revalidatePath('/dashboard/certificados');

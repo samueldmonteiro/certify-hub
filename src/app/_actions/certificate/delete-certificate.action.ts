@@ -1,7 +1,6 @@
 'use server';
 
-import { makeDeleteCertificateUseCase } from '@/src/core/infra/factories/make-delete-certificate.use-case.factory';
-import { makeDeleteManyCertificatesUseCase } from '@/src/core/infra/factories/make-delete-many-certificates.use-case.factory';
+import { certificateServiceFactory } from '@/src/core/factories/service.factory';
 import { revalidatePath } from 'next/cache';
 
 export interface DeleteCertificateResponse {
@@ -11,7 +10,7 @@ export interface DeleteCertificateResponse {
 
 export const deleteCertificateAction = async (id: string): Promise<DeleteCertificateResponse> => {
   try {
-    await makeDeleteCertificateUseCase().execute(id);
+    await certificateServiceFactory().delete(id);
     revalidatePath('/dashboard/certificados');
 
     return {
@@ -27,7 +26,7 @@ export const deleteCertificateAction = async (id: string): Promise<DeleteCertifi
 
 export const deleteManyCertificatesAction = async (ids: string[]): Promise<DeleteCertificateResponse> => {
   try {
-    await makeDeleteManyCertificatesUseCase().execute(ids);
+    await certificateServiceFactory().deleteMany(ids);
     revalidatePath('/dashboard/certificados');
 
     return {
