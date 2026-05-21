@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -17,29 +17,36 @@ model User {
 }
 
 model Certificate {
-  id                 String   @id @default(uuid())
+  id                 String          @id @default(uuid())
   studentName        String
   courseName         String
   cpf                String
   workload           Int
   completionDate     DateTime
   page               String
-  message            String?
-  registrationNumber String   @unique
+  registrationNumber String
   ptsBook            String
-  createdAt          DateTime @default(now())
+  createdAt          DateTime        @default(now())
+  type               CertificateType
 
   @@map("certificates")
 }
 
-/// Stores the ever-increasing sequence counter for registration numbers.
-/// Page is derived from lastRegistrationIndex (ceil(n/50)).
-/// PTSBook is always fixed as 001/currentYear.
-/// Never decremented when certificates are deleted.
-model CertificateSequence {
-  id                    String @id @default("singleton")
-  lastRegistrationIndex Int    @default(0)
-  year                  Int
+enum CertificateType {
+  BRIGADISTA
+  CIPEIRO
+  DIRECAO_DEFENSIVA
+  NR06_EPI
+  BENZENO_NR20
+  DIRECAO_4X4
+}
 
+model CertificateSequence {
+  typeId                String          @default(uuid())
+  year                  Int
+  lastRegistrationIndex Int             @default(0)
+  type                  CertificateType
+
+  @@id([type, year])
   @@map("certificate_sequences")
 }

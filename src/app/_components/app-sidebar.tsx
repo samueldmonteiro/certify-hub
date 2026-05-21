@@ -14,22 +14,28 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/src/app/_components/ui/sidebar';
-import { UserViewModel } from '@/src/core/application/view-models/user.view-model';
 import Image from 'next/image';
 import logo from '../assets/logo_whitout_title.png';
 import Link from 'next/link';
+import { CertificateType, CertificateTypeLabels } from '@/src/core/enums/certificate-type.enum';
 import {
-  FilePlus,
+  GraduationCap,
   FileText,
   Download,
 } from 'lucide-react';
+import { UserViewModel } from '@/src/core/entities/user.entity';
 
 export const data = {
   navMain: [
     {
       title: 'Emitir Certificado',
-      icon: FilePlus,
-      url: '/dashboard/certificados/emitir',
+      icon: GraduationCap,
+      items: (Object.entries(CertificateTypeLabels) as [CertificateType, string][]).map(
+        ([type, label]) => ({
+          title: label,
+          url: `/dashboard/certificados/emitir?tipo=${type}`,
+        }),
+      ),
     },
     {
       title: 'Certificados Emitidos',
@@ -38,18 +44,12 @@ export const data = {
     },
     {
       title: 'Baixar Planilha',
-      url: 'https://docs.google.com/spreadsheets/d/1qcLxyjrlclckcjvMcN6EquAPOO0G65Gs/export?format=xlsx',
+      url: 'https://docs.google.com/spreadsheets/d/14HgfhfrII_ydnz-WelCKMw4dS5UiRSAFwIXNqcr_KwY/export?format=xlsx',
       icon: Download,
     },
   ],
 
-  navSecondary: [
-  /**   {
-      title: 'Configurações',
-      url: '/dashboard/configuracoes',
-      icon: Settings,
-    },**/
-  ],
+  navSecondary: [],
 };
 
 export type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {

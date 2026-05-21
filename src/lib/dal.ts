@@ -5,7 +5,7 @@ import { decrypt } from '@/src/lib/session';
 import { cache } from 'react';
 import { prisma } from './prisma';
 import { redirect } from 'next/navigation';
-import { UserViewModel } from '../core/application/view-models/user.view-model';
+import { UserViewModel } from '../core/entities/user.entity';
 
 export const verifySession = cache(async () => {
   const cookie = (await cookies()).get('session')?.value;
@@ -18,9 +18,8 @@ export const verifySession = cache(async () => {
   return { isAuth: true, userId: session.userId };
 });
 
-export const getUserAuthenticated = cache(async (): Promise<UserViewModel|null> => {
+export const getUserAuthenticated = cache(async (): Promise<UserViewModel> => {
   const session = await verifySession();
-  if (!session) return null;
 
   try {
     const user = await prisma.user.findUniqueOrThrow({ where: { id: String(session.userId) } });
@@ -33,7 +32,7 @@ export const getUserAuthenticated = cache(async (): Promise<UserViewModel|null> 
     
   } catch {
     console.log('Failed to fetch user');
-    return null;
+    redirect('/api/auth/logout');
   }
 });
 

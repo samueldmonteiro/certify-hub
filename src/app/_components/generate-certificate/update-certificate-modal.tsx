@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { CertificateType, CertificateTypeLabels } from '@/src/core/enums/certificate-type.enum';
 
 interface UpdateCertificateModalProps {
   isOpen: boolean;
@@ -19,31 +20,21 @@ export function UpdateCertificateModal({
   onUpdate,
   certificate,
 }: UpdateCertificateModalProps) {
-  const [formData, setFormData] = useState({
-    studentName: '',
-    cpf: '',
-    courseName: '',
-    workload: '',
-    completionDate: '',
-    message: '',
-  });
+  const [formData, setFormData] = useState(() => ({
+    studentName: certificate?.studentName || '',
+    cpf: certificate?.cpf || '',
+    courseName: certificate?.courseName || '',
+    workload: certificate?.workload ? String(certificate.workload) : '',
+    completionDate: certificate?.completionDate
+      ? new Date(certificate.completionDate).toISOString().split('T')[0]
+      : '',
+    page: certificate?.page || '',
+    ptsBook: certificate?.ptsBook || '',
+    registrationNumber: certificate?.registrationNumber || '',
+    type: certificate?.type || CertificateType.BRIGADISTA,
+  }));
 
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (certificate) {
-      setFormData({
-        studentName: certificate.studentName || '',
-        cpf: certificate.cpf || '',
-        courseName: certificate.courseName || '',
-        workload: certificate.workload ? String(certificate.workload) : '',
-        completionDate: certificate.completionDate
-          ? new Date(certificate.completionDate).toISOString().split('T')[0]
-          : '',
-        message: certificate.message || '',
-      });
-    }
-  }, [certificate]);
 
   if (!isOpen || !certificate) return null;
 
@@ -57,7 +48,10 @@ export function UpdateCertificateModal({
         courseName: formData.courseName,
         workload: Number(formData.workload),
         completionDate: new Date(formData.completionDate + 'T00:00:00'),
-        message: formData.message || undefined,
+        page: formData.page || undefined,
+        ptsBook: formData.ptsBook || undefined,
+        registrationNumber: formData.registrationNumber || undefined,
+        type: formData.type,
       });
       onClose();
     } catch (err) {
@@ -67,7 +61,7 @@ export function UpdateCertificateModal({
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -153,13 +147,54 @@ export function UpdateCertificateModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="message">Mensagem Personalizada (Opcional)</Label>
-              <Input
-                id="message"
-                name="message"
-                value={formData.message}
+              <Label htmlFor="type">Tipo de Certificado</Label>
+              <select
+                id="type"
+                name="type"
+                value={formData.type}
                 onChange={handleChange}
-              />
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {Object.entries(CertificateTypeLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="page">Página</Label>
+                <Input
+                  id="page"
+                  name="page"
+                  placeholder="Ex: 001/2025"
+                  value={formData.page}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="registrationNumber">Nº Registro</Label>
+                <Input
+                  id="registrationNumber"
+                  name="registrationNumber"
+                  placeholder="Ex: 0001/2025"
+                  value={formData.registrationNumber}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ptsBook">Livro PTS</Label>
+                <Input
+                  id="ptsBook"
+                  name="ptsBook"
+                  value={formData.ptsBook}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
           </form>
         </div>

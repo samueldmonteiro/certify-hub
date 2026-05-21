@@ -1,22 +1,40 @@
 
+import { CertificateType } from '../../core/enums/certificate-type.enum';
+import { certificateContents } from './certificate-contents';
+import { imageToBase64 } from '@/src/lib/image-to-base64';
+import path from 'path';
+
 export interface CertificateTemplateProps {
   studentName: string;
   cpf: string;
-  courseName: string;
   date: Date;
   hours: number;
-  logoSrc: string;
-  seloSrc: string;
   registrationNumber: string;
   page: string;
   ptsBook: string;
-  message?: string;
-  assinatura1Src: string;
-  assinatura2Src: string;
+  type: CertificateType;
 }
 
 export function generateCertificateHTML(data: CertificateTemplateProps): string {
-  const { studentName, cpf, courseName, date, hours, logoSrc, seloSrc, registrationNumber, page, ptsBook, message, assinatura1Src, assinatura2Src } = data;
+  const { studentName, cpf, date, hours, registrationNumber, page, ptsBook, type } = data;
+
+  const logoSrc = imageToBase64(path.join(process.cwd(), 'src/app/assets/logo.png'));
+  const seloSrc = imageToBase64(path.join(process.cwd(), 'src/app/assets/selo.png'));
+
+  const content = certificateContents[type];
+  const formattedDate = date.toLocaleDateString('pt-BR');
+
+  const signature1HTML = content.signature1Text.replace(
+    '<div class="line"></div>',
+    `<img class="signature-img" src="${content.signature1Image}" alt="Assinatura" />
+    <div class="line"></div>`,
+  );
+
+  const signature2HTML = content.signature2Text.replace(
+    '<div class="line"></div>',
+    `<img class="signature-img" src="${content.signature2Image}" alt="Assinatura" />
+    <div class="line"></div>`,
+  );
 
   return `<!DOCTYPE html>
 <html>
@@ -340,37 +358,17 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
         <p class="student-name">${studentName}</p>
         <div class="divider"></div>
         <div class="description">
-          ${message ? `<p>${message}</p>` : `<p>
-            CPF: <strong>${cpf}</strong>, participou do treinamento
-            de <strong>${courseName}</strong>, no dia <strong>${date.toLocaleDateString('pt-BR')}</strong>, com
-            carga horária de <strong>${hours}h</strong>, conforme <strong>NR</strong>
-            <strong>NR 23, NBR 14.276/2020 e NT-17 CBMMA</strong>, tendo seu o aproveitamento satisfatório.
-          </p>`}
-          
+          <p>${content.frontDescription(studentName, cpf, formattedDate, hours)}</p>
         </div>
       </div>
 
       <div class="footer">
         <div class="signature">
           <img src="${seloSrc}" class="seal" alt="Selo Best Quality" />
-          <div>
-            <img class="signature-img" src="${assinatura1Src}" alt="Assinatura" />
-            <div class="line"></div>
-            <strong>COORDENADOR RESPONSÁVEL</strong>
-            Rodrigo Márcio Silva de Oliveira<br />
-            Engenheiro de Segurança do Trabalho<br />
-            Credenciamento CBMMA 991413/092023
-          </div>
+          ${signature1HTML}
         </div>
         <div class="signature">
-          <div>
-            <img class="signature-img" src="${assinatura2Src}" alt="Assinatura" />
-            <div class="line"></div>
-            <strong>INSTRUTOR PCI E APH</strong>
-            Lourival Taveira Lobão Neto<br />
-            Bombeiro Industrial Civil<br />
-            Credenciamento CBMMA 440229/092023
-          </div>
+          ${signature2HTML}
         </div>
       </div>
     </div>
@@ -395,38 +393,7 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
 </svg>
 
       <div class="content-left">
-        <h2>CONTEÚDO PROGRAMÁTICO :</h2>
-        <strong class="sub-title">Prevenção e combate ao princípio de incêndio: Conteúdo teórico e prático</strong>
-        <ul>
-          <li>Objetivos e atribuições da brigada de incêndio e emergência;</li>
-          <li>Teoria do fogo:reação em cadeia elementos, funções, pontos de fulgor, ignição e combustão;</li>
-          <li>Formas de  propagação do fogo: condução, irradiação e convecção;</li>
-          <li>Classes de incêndio e suas características;</li>
-          <li>Prevenção do Incêndio: técnicas de prevenção;</li>
-          <li>Métodos de extinção: resfriamento,isolamento, abafamento;</li>
-          <li>Equipamentos de combate a incêndio: extintores, hidrantes, mangueiras e acessórios;</li>
-          <li>Combate à incêndios em cozinhas industriais, equipamentos e formas de utilização e combate;</li>
-          <li>EPI’s- Equipamento de Proteção Individual , sua importância e utilidade;</li>
-          <li>Equipamentos de detecção, alarme, luz de emergência e comunicações;</li>
-          <li>Abandono de área: técnicas de saída organizada, pontos de encontro, chamada e controle de pânico;</li>
-          <li>Atendimento à pessoas com mobilidade reduzida: formas de abordagem durante o atendimento à emergência.</li>
-        </ul>
-        <h3>Primeiros Socorros : Conteúdo teórico e prático</h3>
-        <ul>
-          <li>Avaliação inicial do cenário;</li>
-          <li>Análise de vítimas, avaliações primária e secundária;</li>
-          <li>Obstrução de vias aéreas por corpos estranhos (OVACE);</li>
-          <li>RCP – Reanimação Cárdio Pulmonar;</li>
-          <li>Estado de choque, crises emocionais: classificação,avaliação dos sinais e técnicas de prevenção e tratamento;</li>
-          <li>Hemorragias: Tipos, Classificação e tratamento;</li>
-          <li>Fraturas;</li>
-          <li>Queimaduras;</li>
-          <li>Manipulação e transporte de vítimas.</li>
-          <li>Fraturas: Tipos, Classificação e tratamento;</li>
-          <li>Queimaduras: Tipos, Classificação e tratamento;</li>
-          <li>Manipulação e  transporte de vítimas;</li>
-        </ul>
-        <strongc class="workload">CARGA HORÁRIA TOTAL : 08 HORAS</strong>
+        ${content.programmaticContent}
       </div>
 
       <div class="content-right">
@@ -445,10 +412,10 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
         </div>
         <div class="box">
           <strong>Certificado emitido conforme</strong>
-          NR-23 NBR 14.276/2020 NT 17 CBMMA
+          ${content.legalTextRight}
         </div>
         <div class="box small-text">
-          Este certificado tem validade para prova de títulos,fins curriculares e demais utilidades,na qualidade para o curso de BRIGADISTA,respeitando-se os conteúdos e  carga horária, conforme NBR 14.276/2020 e NT17 parte 1 CBMMA, não podendo ser utilizado para outros fins.
+          ${content.validityText}
         </div>
       </div>
     </div>

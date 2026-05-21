@@ -1,9 +1,9 @@
 'use server';
 
-import { CertificatePresenter } from '@/src/core/application/presenters/certificate.presenter';
-import { CertificateViewModel } from '@/src/core/application/view-models/certificate.view-model';
-import { CertificateSearchParams, PaginatedResult } from '@/src/core/domain/repositories/certificate.repository';
-import { makeSearchCertificatesUseCase } from '@/src/core/infra/factories/make-search-certificates.use-case.factory';
+import { CertificateViewModel } from '@/src/core/entities/certificate.entity';
+import { certificateServiceFactory } from '@/src/core/factories/service.factory';
+import { CertificateSearchParams, PaginatedResult } from '@/src/core/repositories/certificate.repository';
+
 
 export interface SearchCertificatesActionResponse {
   success?: boolean
@@ -15,10 +15,9 @@ export const searchCertificatesAction =
   async (_prevState: any, params: CertificateSearchParams): Promise<SearchCertificatesActionResponse> => {
 
     try {
-      const response = await makeSearchCertificatesUseCase().execute(params);
+      const response = await certificateServiceFactory().search(params);
 
-      const certificatesViewModel = CertificatePresenter.toManyViewModel(response.items);
-
+      const certificatesViewModel = response.items.map((certificate) => certificate.toViewModel());
       return {
         success: true,
         data: {

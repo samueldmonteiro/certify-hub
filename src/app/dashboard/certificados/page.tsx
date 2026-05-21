@@ -10,7 +10,6 @@ import {
   MoreVertical,
   X,
   Loader2,
-  Package,
   Edit,
   Eye,
 } from 'lucide-react';
@@ -78,7 +77,6 @@ export default function CertificatesPage() {
 
   // Download state
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [isBatchDownloading, setIsBatchDownloading] = useState(false);
 
   // Modal states for view/update
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
@@ -203,36 +201,6 @@ export default function CertificatesPage() {
     }
   };
 
-  /** Download em lote — gera ZIP on-demand */
-  const handleBatchDownload = async () => {
-    if (selectedCertificates.length === 0) return;
-    setIsBatchDownloading(true);
-    try {
-      const res = await fetch('/api/certificates/batch-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: selectedCertificates }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || 'Erro ao gerar ZIP');
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `certificados_${Date.now()}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error: any) {
-      setDeleteMessage({ type: 'error', text: error.message || 'Erro ao baixar certificados.' });
-    } finally {
-      setIsBatchDownloading(false);
-    }
-  };
-
   const formatDate = (date: Date) => new Date(date).toLocaleDateString('pt-BR');
   const formatCPF = (cpf: string) =>
     cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
@@ -345,25 +313,12 @@ export default function CertificatesPage() {
               </span>
               <div className="flex gap-2">
                 <Button
-                  size="sm"
-                  onClick={handleBatchDownload}
-                  disabled={isBatchDownloading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {isBatchDownloading ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Package className="w-4 h-4 mr-2" />
-                  )}
-                  {isBatchDownloading ? 'Gerando Certificados...' : 'Baixar Certificados'}
-                </Button>
-                <Button
                   className="text-white bg-red-500 hover:bg-red-600"
                   size="sm"
                   onClick={() => setDeleteModalOpen(true)}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Deletar Selecionados
+                   Deletar Selecionados
                 </Button>
               </div>
             </div>
@@ -450,7 +405,7 @@ export default function CertificatesPage() {
                                   }}
                                 >
                                   <Eye className="w-4 h-4 mr-2" />
-                                  Visualizar
+                                   Visualizar
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="cursor-pointer"
@@ -460,7 +415,7 @@ export default function CertificatesPage() {
                                   }}
                                 >
                                   <Edit className="w-4 h-4 mr-2" />
-                                  Editar
+                                   Editar
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="cursor-pointer text-red-600 focus:text-red-600"
@@ -470,7 +425,7 @@ export default function CertificatesPage() {
                                   }}
                                 >
                                   <Trash2 className="w-4 h-4 mr-2" />
-                                  Deletar
+                                   Deletar
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -590,25 +545,30 @@ export default function CertificatesPage() {
       </AlertDialog>
 
       {/* Modais de Exibição e Edição */}
-      <ViewCertificateModal
-        isOpen={viewModalOpen}
-        onClose={() => {
-          setViewModalOpen(false);
-          setSelectedCertificateData(null);
-        }}
-        certificate={selectedCertificateData}
-        onDownload={handleDownloadSingle}
-      />
+      {viewModalOpen && selectedCertificateData && (
+        <ViewCertificateModal
+          isOpen={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setSelectedCertificateData(null);
+          }}
+          certificate={selectedCertificateData}
+          onDownload={handleDownloadSingle}
+        />
+      )}
 
-      <UpdateCertificateModal
-        isOpen={updateModalOpen}
-        onClose={() => {
-          setUpdateModalOpen(false);
-          setSelectedCertificateData(null);
-        }}
-        certificate={selectedCertificateData}
-        onUpdate={handleUpdate}
-      />
+      {updateModalOpen && selectedCertificateData && (
+        <UpdateCertificateModal
+          key={selectedCertificateData.id}
+          isOpen={updateModalOpen}
+          onClose={() => {
+            setUpdateModalOpen(false);
+            setSelectedCertificateData(null);
+          }}
+          certificate={selectedCertificateData}
+          onUpdate={handleUpdate}
+        />
+      )}
     </div>
   );
 }

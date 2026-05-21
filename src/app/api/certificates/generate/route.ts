@@ -1,49 +1,51 @@
-import { CertificatePresenter } from '@/src/core/application/presenters/certificate.presenter';
-import { CertificateViewModel } from '@/src/core/application/view-models/certificate.view-model';
-import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
-import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
-import { makeRegisterCertificatesUseCase } from '@/src/core/infra/factories/make-register-certificates.use-case.factory';
-import { CertificateDraftArraySchema, CertificateDraftErrorsSchema, CertificateDraftSchemaDTO } from '@/src/core/infra/http/schemas/certificate-student-data.schema';
+import { CertificateDraftArraySchema, CertificateDraftErrorsSchema, CertificateDraftSchemaDTO } from '@/src/core/validations/certificate-student-data.schema';
 import { NextResponse } from 'next/server';
-import z from 'zod';
+import { registerCertificateDataServiceFactory } from '@/src/core/factories/service.factory';
+import { RegisterCertificateRequest } from '@/src/core/services/register-certificate-data.service';
+import { CertificateType } from '@/src/core/enums/certificate-type.enum';
+import { CertificateViewModel } from '@/src/core/entities/certificate.entity';
 
-export interface RegisterCertificatesResponse {
-  success: boolean,
-  data?: CertificateViewModel[],
+export type RegisterCertificatesResponse = {
+  success: true;
+  data: CertificateViewModel[];
+} | {
+  success: false;
+  message: string;
   errors?: CertificateDraftErrorsSchema
-  message?: string
 }
-
 export async function POST(req: Request) {
   const body = await req.json() as CertificateDraftSchemaDTO[];
 
   const parsed = CertificateDraftArraySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { success: false, errors: z.formatError(parsed.error) },
+      {
+        success: false,
+        message: 'Dados de entrada inválidos.',
+        errors: parsed.error.format(),
+      },
       { status: 400 },
     );
   }
 
-  const data: CertificateDraft[] = [];
+  const data: RegisterCertificateRequest[] = [];
   body.forEach(d => {
     data.push({
-      completionDate: new Date(d.completionDate),
-      courseName: d.courseName,
-      cpf: new CPF(d.cpf),
+      date: new Date(d.date),
+      cpf: d.cpf,
       studentName: d.studentName,
-      workload: d.workload,
-      message: d.message,
+      hours: d.hours,
+      type: d.type as CertificateType,
     });
   });
 
   try {
     console.log(data);
-    const result = await makeRegisterCertificatesUseCase().execute(data);
+    const result = await registerCertificateDataServiceFactory().register(data);
 
     return NextResponse.json({
       success: true,
-      data: CertificatePresenter.toManyViewModel(result.certificates),
+      data: result.certificates.map((certificate) => certificate.toViewModel()),
     });
   } catch (error: any) {
     return NextResponse.json(
