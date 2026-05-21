@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 import { FailFileCertificateGeneratorError } from '../../errors/fail-file-certificate-generate.error';
@@ -24,7 +27,7 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
       });
 
       // Lançar navegador
-      const executablePath = process.env.CHROMIUM_PATH ?? await chromium.executablePath();
+      const executablePath = await this.resolveExecutablePath();
 
       browser = await puppeteer.launch({
         args: chromium.args,
@@ -57,6 +60,25 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
       if (browser) {
         await browser.close();
       }
+    }
+  }
+
+  private async resolveExecutablePath(): Promise<string> {
+    const customPath = process.env.CHROMIUM_PATH;
+    if (customPath) {
+      return customPath;
+    }
+
+    try {
+      return await chromium.executablePath();
+    } catch {
+      const _require = createRequire(fileURLToPath(import.meta.url));
+      const pkgPath = _require.resolve('@sparticuz/chromium/package.json');
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      const arch = process.arch === 'arm64' ? 'arm64' : 'x64';
+      const packUrl = `https://github.com/Sparticuz/chromium/releases/download/v${pkg.version}/chromium-v${pkg.version}-pack.${arch}.tar`;
+
+      return await chromium.executablePath(packUrl);
     }
   }
 }
