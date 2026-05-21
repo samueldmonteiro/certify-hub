@@ -64,21 +64,27 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
   }
 
   private async resolveExecutablePath(): Promise<string> {
-    const customPath = process.env.CHROMIUM_PATH;
-    if (customPath) {
-      return customPath;
+    if (process.env.CHROMIUM_PATH) {
+      return process.env.CHROMIUM_PATH;
     }
 
-    try {
-      return await chromium.executablePath();
-    } catch {
-      const _require = createRequire(fileURLToPath(import.meta.url));
-      const pkgPath = _require.resolve('@sparticuz/chromium/package.json');
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
-      const arch = process.arch === 'arm64' ? 'arm64' : 'x64';
-      const packUrl = `https://github.com/Sparticuz/chromium/releases/download/v${pkg.version}/chromium-v${pkg.version}-pack.${arch}.tar`;
+    // Em produção (Vercel), usar a URL externa do pack para evitar erros de binário ausente
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+      let version = '143.0.4';
+      try {
+        const _require = createRequire(fileURLToPath(import.meta.url));
+        const pkgPath = _require.resolve('@sparticuz/chromium/package.json');
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+        version = pkg.version;
+      } catch {
+        // Ignora erro e usa versão hardcoded como fallback
+      }
 
+      const packUrl = `https://github.com/Sparticuz/chromium/releases/download/v${version}/chromium-v${version}-pack.tar`;
       return await chromium.executablePath(packUrl);
     }
+
+    // No desenvolvimento local, tentar resolver o executável empacotado
+    return await chromium.executablePath();
   }
 }
