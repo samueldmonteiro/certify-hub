@@ -8,10 +8,9 @@ import StudentTable from '@/src/app/_components/generate-certificate/student-tab
 import SingleStudentForm from '@/src/app/_components/generate-certificate/single-student-form';
 import RegisterButton from '@/src/app/_components/generate-certificate/register-button';
 import { Alert } from '@/src/app/_components/custom/alert';
-import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
 import { RegisterCertificatesResponse } from '@/src/app/api/certificates/generate/route';
-import { formatDateToPTBR } from '@/src/lib/utils';
 import { useRouter } from 'next/navigation';
+import { RegisterCertificateRequest } from '@/src/core/services/register-certificate-data.service';
 
 function RegistrationSuccessModal({
   isOpen,
@@ -222,8 +221,8 @@ function ErrorModal({
 }
 
 export default function CertificadosEmitirPage() {
-  const [students, setStudents] = useState<CertificateDraft[]>([]);
-  const [selectedStudents, setSelectedStudents] = useState<CertificateDraft[]>([]);
+  const [students, setStudents] = useState<RegisterCertificateRequest[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<RegisterCertificateRequest[]>([]);
   const [isRegistering, setIsRegistering] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentCount, setCurrentCount] = useState(0);
@@ -234,13 +233,13 @@ export default function CertificadosEmitirPage() {
   const [registeredCount, setRegisteredCount] = useState(0);
   const [studentsDataError, setStudentsDataError] = useState<string | null>(null);
 
-  const handleFileProcessed = (data: CertificateDraft[]) => {
+  const handleFileProcessed = (data: RegisterCertificateRequest[]) => {
     setStudents(data);
     setSelectedStudents([]);
     setStudentsDataError(null);
   };
 
-  const handleSelectionChange = (selected: CertificateDraft[]) => {
+  const handleSelectionChange = (selected: RegisterCertificateRequest[]) => {
     setSelectedStudents(selected);
   };
 
@@ -273,11 +272,10 @@ export default function CertificadosEmitirPage() {
       const batchStudents = selectedStudents.slice(i, i + batchSize);
       const batchData = batchStudents.map(d => ({
         studentName: d.studentName,
-        courseName: d.courseName,
-        completionDate: d.completionDate.toISOString(),
-        cpf: d.cpf.getValue(),
-        workload: d.workload,
-        message: d.message,
+        date: d.date.toISOString(),
+        cpf: d.cpf,
+        hours: d.hours,
+        type: d.type,
       }));
       batches.push(batchData);
     }
@@ -338,7 +336,7 @@ export default function CertificadosEmitirPage() {
     }
   };
 
-  const handleRegisterSingle = async (student: CertificateDraft) => {
+  const handleRegisterSingle = async (student: RegisterCertificateRequest) => {
     setIsRegistering(true);
     setStudentsDataError(null);
     setProgress(15);
@@ -351,11 +349,10 @@ export default function CertificadosEmitirPage() {
     const dataRequest = [
       {
         studentName: student.studentName,
-        courseName: student.courseName,
-        completionDate: student.completionDate.toISOString(),
-        cpf: student.cpf.getValue(),
-        workload: student.workload,
-        message: student.message,
+        date: student.date.toISOString(),
+        cpf: student.cpf,
+        hours: student.hours,
+        type: student.type,
       },
     ];
 

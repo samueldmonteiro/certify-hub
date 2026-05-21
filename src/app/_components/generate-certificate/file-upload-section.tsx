@@ -5,11 +5,11 @@ import { Upload, FileSpreadsheet, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from '@/src/app/_components/ui/card';
 import { Alert, AlertDescription } from '@/src/app/_components/ui/alert';
 import * as XLSX from 'xlsx';
-import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
-import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
+import { RegisterCertificateRequest } from '@/src/core/services/register-certificate-data.service';
+import { CertificateType } from '@/src/core/enums/certificate-type.enum';
 
 interface FileUploadSectionProps {
-  onFileProcessed: (data: CertificateDraft[]) => void;
+  onFileProcessed: (data: RegisterCertificateRequest[]) => void;
 }
 
 export default function FileUploadSection({ onFileProcessed }: FileUploadSectionProps) {
@@ -65,10 +65,6 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
     return null;
   };
 
-  const validateDate = (date: string): boolean => {
-    return parseBrDate(date) !== null;
-  };
-
   const processFile = async (file: File) => {
     setIsLoading(true);
     setError(null);
@@ -84,7 +80,7 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
       });
 
       // Validação dos dados
-      const students: CertificateDraft[] = [];
+      const students: RegisterCertificateRequest[] = [];
       const errors: string[] = [];
 
       jsonData.forEach((row: any, index: number) => {
@@ -94,10 +90,6 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
         // 1. Validar Nome
         if (!row.NOME_ALUNO || String(row.NOME_ALUNO).trim().length < 2) {
           rowErrors.push('Nome ausente ou curto demais');
-        }
-
-        if(!row.NOME_CURSO || String(row.NOME_CURSO).trim().length < 2) {
-          rowErrors.push('Nome do curso ausente ou curto demais');
         }
 
         // 2. Validar CPF
@@ -126,11 +118,10 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
           // Se não houver erros na linha, adiciona ao array de sucesso
           students.push({
             studentName: String(row.NOME_ALUNO).trim(),
-            cpf: new CPF(cpfStr),
-            completionDate: parsedDate!,
-            workload: workload,
-            courseName: String(row.NOME_CURSO).trim(),
-            message: row.MENSAGEM_PERSONALIZADA ? String(row.MENSAGEM_PERSONALIZADA).trim() : undefined,
+            cpf: cpfStr,
+            date: parsedDate!,
+            hours: workload,
+            type: CertificateType.BRIGADISTA,
           });
         }
       });

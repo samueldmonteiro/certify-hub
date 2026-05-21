@@ -10,13 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/app/_components/ui/table';
-import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
+import { RegisterCertificateRequest } from '@/src/core/services/register-certificate-data.service';
 import { formatDateToPTBR } from '@/src/lib/utils';
 
 interface StudentTableProps {
-  students: CertificateDraft[];
-  selectedStudents: CertificateDraft[];
-  onSelectionChange: (selected: CertificateDraft[]) => void;
+  students: RegisterCertificateRequest[];
+  selectedStudents: RegisterCertificateRequest[];
+  onSelectionChange: (selected: RegisterCertificateRequest[]) => void;
 }
 
 export default function StudentTable({
@@ -25,12 +25,12 @@ export default function StudentTable({
   onSelectionChange,
 }: StudentTableProps) {
   // Criar um identificador único para cada aluno (nome + CPF)
-  const getStudentId = (student: CertificateDraft) => {
-    return `${student.studentName}-${student.cpf.getValue()}`;
+  const getStudentId = (student: RegisterCertificateRequest) => {
+    return `${student.studentName}-${student.cpf}`;
   };
 
   // Verificar se um aluno específico está selecionado
-  const isStudentSelected = (student: CertificateDraft) => {
+  const isStudentSelected = (student: RegisterCertificateRequest) => {
     return selectedStudents.some(
       selected => getStudentId(selected) === getStudentId(student),
     );
@@ -44,7 +44,7 @@ export default function StudentTable({
     }
   };
 
-  const handleSelectOne = (student: CertificateDraft, checked: boolean) => {
+  const handleSelectOne = (student: RegisterCertificateRequest, checked: boolean) => {
     if (checked) {
       onSelectionChange([...selectedStudents, student]);
     } else {
@@ -95,8 +95,8 @@ export default function StudentTable({
                     />
                   </TableCell>
                   <TableCell className="font-medium">{student.studentName}</TableCell>
-                  <TableCell>{student.cpf.getValue()}</TableCell>
-                  <TableCell>{formatDateToPTBR(student.completionDate)}</TableCell>
+                  <TableCell>{student.cpf}</TableCell>
+                  <TableCell>{formatDateToPTBR(student.date)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

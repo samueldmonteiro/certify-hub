@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src
 import { Button } from '@/src/app/_components/ui/button';
 import { Input } from '@/src/app/_components/ui/input';
 import { Label } from '@/src/app/_components/ui/label';
-import { CertificateDraft } from '@/src/core/domain/value-objects/certificate-draft.value-object';
-import { CPF } from '@/src/core/domain/value-objects/cpf.value-object';
+import { RegisterCertificateRequest } from '@/src/core/services/register-certificate-data.service';
+import { CertificateType } from '@/src/core/enums/certificate-type.enum';
 
 interface SingleStudentFormProps {
-  onSubmit: (student: CertificateDraft) => void;
+  onSubmit: (student: RegisterCertificateRequest) => void;
   isRegistering: boolean;
 }
 
@@ -26,12 +26,11 @@ export default function SingleStudentForm({ onSubmit, isRegistering }: SingleStu
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      cpf: new CPF(formData.cpf),
+      cpf: formData.cpf,
       studentName: formData.studentName,
-      courseName: formData.courseName,
-      workload: Number(formData.workload),
-      completionDate: new Date(formData.completionDate),
-      message: formData.message || undefined,
+      hours: Number(formData.workload),
+      date: new Date(formData.completionDate),
+      type: CertificateType.BRIGADISTA,
     });
   };
 

@@ -3,6 +3,7 @@ export enum CertificateType {
   CIPEIRO = 'CIPEIRO',
   DIRECAO_DEFENSIVA = 'DIRECAO_DEFENSIVA',
   GENERICO_1 = 'GENERICO_1',
+
 }
 
 export const CertificateTypeLabels = {

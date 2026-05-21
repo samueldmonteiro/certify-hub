@@ -41,6 +41,7 @@ export function UpdateCertificateModal({
           ? new Date(certificate.completionDate).toISOString().split('T')[0]
           : '',
         message: certificate.message || '',
+        
       });
     }
   }, [certificate]);
