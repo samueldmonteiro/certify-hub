@@ -3,6 +3,7 @@ import { DomainError } from '../errors/domain.error';
 import { ResourceNotFoundError } from '../errors/resource-not-found.error';
 import { IMakeCertificatePdfProvider } from '../providers/make-certificate-pdf/make-certificate-pdf.provider';
 import { CertificateSearchParams, ICertificateRepository, PaginatedResult } from '../repositories/certificate.repository';
+import { CertificateType } from '../enums/certificate-type.enum';
 import { CertificatePage } from '../value-objects/certificate-page.value-object';
 import { CPF } from '../value-objects/cpf.value-object';
 import { PTSBook } from '../value-objects/pts-book.value-object';
@@ -18,6 +19,7 @@ export interface UpdateCertificateRequest {
   registrationNumber?: string;
   page?: string
   ptsBook?: string
+  type?: CertificateType
 }
 
 export class CertificateService {
@@ -66,6 +68,9 @@ export class CertificateService {
     }
     if (request.ptsBook) {
       certificate.changePtsBook(new PTSBook(request.ptsBook));
+    }
+    if (request.type) {
+      certificate.changeType(request.type);
     }
 
     const updatedCertificate = await this.certificateRepository.update(certificate);

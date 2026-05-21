@@ -24,9 +24,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/src/app/_components/ui/sidebar';
-import { UserViewModel } from '@/src/core/application/view-models/user.view-model';
 import { getCutName } from '../../lib/utils';
 import { logoutAction } from '../_actions/logout.action';
+import { UserViewModel } from '@/src/core/entities/user.entity';
 
 export function NavUser({
   user,

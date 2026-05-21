@@ -12,10 +12,8 @@ import {
   SidebarTrigger,
 } from '@/src/app/_components/ui/sidebar';
 import { getUserAuthenticated } from '@/src/lib/dal';
-import { redirect } from 'next/navigation';
 import { ModeToggle } from '../_components/mode-toggle';
 import Link from 'next/link';
-
 export default async function DashboardLayout({
   children,
 }: {
@@ -23,9 +21,6 @@ export default async function DashboardLayout({
 }) {
 
   const user = await getUserAuthenticated();
-  if (!user) {
-    redirect('/login');
-  }
 
   return (
     <SidebarProvider>

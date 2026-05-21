@@ -107,7 +107,7 @@ describe('RegisterCertificateDataService (Integration)', () => {
     expect(seq!.lastRegistrationIndex).toBe(2);
   });
 
-  it('should not allow certificates with the same registration number from different types', async () => {
+  it('should allow certificates with the same registration number from different types', async () => {
     await sut.register([
       {
         studentName: 'Alice',
@@ -118,17 +118,19 @@ describe('RegisterCertificateDataService (Integration)', () => {
       },
     ]);
 
-    await expect(
-      sut.register([
-        {
-          studentName: 'Bob',
-          cpf: '62910723356',
-          date: new Date('2024-03-03'),
-          hours: 12,
-          type: CertificateType.CIPEIRO,
-        },
-      ]),
-    ).rejects.toThrow();
+    const result = await sut.register([
+      {
+        studentName: 'Bob',
+        cpf: '62910723356',
+        date: new Date('2024-03-03'),
+        hours: 12,
+        type: CertificateType.CIPEIRO,
+      },
+    ]);
+
+    // Each type has its own sequence, so both start at 0001/{year}
+    expect(result.certificates[0].registrationNumber.getValue()).toBe(`0001/${currentYear}`);
+    expect(result.certificates[0].type).toBe(CertificateType.CIPEIRO);
 
     const cipSeq = await prisma.certificateSequence.findUnique({
       where: {
@@ -136,7 +138,7 @@ describe('RegisterCertificateDataService (Integration)', () => {
       },
     });
     expect(cipSeq).not.toBeNull();
-    expect(cipSeq!.lastRegistrationIndex).toBe(0);
+    expect(cipSeq!.lastRegistrationIndex).toBe(1);
   });
 
   it('should assign page 002 and registration 0051 when registering 51 certificates of the same type', async () => {
@@ -170,7 +172,7 @@ describe('RegisterCertificateDataService (Integration)', () => {
     expect(dbCerts[50].registrationNumber).toBe(`0051/${currentYear}`);
   });
 
-  it('should rollback the transaction when a unique constraint is violated', async () => {
+  it('should register a certificate even when the registration number already exists for the same type', async () => {
     await sut.register([
       {
         studentName: 'Alice',
@@ -181,6 +183,7 @@ describe('RegisterCertificateDataService (Integration)', () => {
       },
     ]);
 
+    // Manually insert a cert with the same registration number that the sequence would generate next
     await prisma.certificate.create({
       data: {
         id: 'pre-existing-cert',
@@ -196,23 +199,26 @@ describe('RegisterCertificateDataService (Integration)', () => {
       },
     });
 
-    await expect(
-      sut.register([
-        {
-          studentName: 'Bob',
-          cpf: '62910723356',
-          date: new Date('2024-03-03'),
-          hours: 12,
-          type: CertificateType.BRIGADISTA,
-        },
-      ]),
-    ).rejects.toThrow();
+    // Should succeed even with the duplicate registration number
+    const result = await sut.register([
+      {
+        studentName: 'Bob',
+        cpf: '62910723356',
+        date: new Date('2024-03-03'),
+        hours: 12,
+        type: CertificateType.BRIGADISTA,
+      },
+    ]);
 
+    expect(result.certificates).toHaveLength(1);
+    expect(result.certificates[0].studentName).toBe('Bob');
+
+    // Sequence should still be incremented correctly
     const dbSeq = await prisma.certificateSequence.findUnique({
       where: {
         type_year: { type: CertificateType.BRIGADISTA, year: currentYear },
       },
     });
-    expect(dbSeq!.lastRegistrationIndex).toBe(1);
+    expect(dbSeq!.lastRegistrationIndex).toBe(2);
   });
 });

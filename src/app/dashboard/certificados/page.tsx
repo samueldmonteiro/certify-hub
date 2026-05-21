@@ -10,7 +10,6 @@ import {
   MoreVertical,
   X,
   Loader2,
-  Package,
   Edit,
   Eye,
 } from 'lucide-react';
@@ -78,7 +77,6 @@ export default function CertificatesPage() {
 
   // Download state
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [isBatchDownloading, setIsBatchDownloading] = useState(false);
 
   // Modal states for view/update
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
@@ -203,36 +201,6 @@ export default function CertificatesPage() {
     }
   };
 
-  /** Download em lote — gera ZIP on-demand */
-  const handleBatchDownload = async () => {
-    if (selectedCertificates.length === 0) return;
-    setIsBatchDownloading(true);
-    try {
-      const res = await fetch('/api/certificates/batch-download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: selectedCertificates }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || 'Erro ao gerar ZIP');
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `certificados_${Date.now()}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error: any) {
-      setDeleteMessage({ type: 'error', text: error.message || 'Erro ao baixar certificados.' });
-    } finally {
-      setIsBatchDownloading(false);
-    }
-  };
-
   const formatDate = (date: Date) => new Date(date).toLocaleDateString('pt-BR');
   const formatCPF = (cpf: string) =>
     cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
@@ -335,41 +303,28 @@ export default function CertificatesPage() {
             <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-4">
               {state.message}
             </div>
-          )}
+           )}
 
-          {/* Barra de ações de seleção */}
-          {selectedCertificates.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded mb-4 flex items-center justify-between flex-wrap gap-2">
-              <span className="text-blue-800 text-sm font-medium">
-                {selectedCertificates.length} certificado(s) selecionado(s)
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={handleBatchDownload}
-                  disabled={isBatchDownloading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {isBatchDownloading ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Package className="w-4 h-4 mr-2" />
-                  )}
-                  {isBatchDownloading ? 'Gerando Certificados...' : 'Baixar Certificados'}
-                </Button>
-                <Button
-                  className="text-white bg-red-500 hover:bg-red-600"
-                  size="sm"
-                  onClick={() => setDeleteModalOpen(true)}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Deletar Selecionados
-                </Button>
-              </div>
-            </div>
-          )}
+           {/* Barra de ações de seleção */}
+           {selectedCertificates.length > 0 && (
+             <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded mb-4 flex items-center justify-between flex-wrap gap-2">
+               <span className="text-blue-800 text-sm font-medium">
+                 {selectedCertificates.length} certificado(s) selecionado(s)
+               </span>
+               <div className="flex gap-2">
+                 <Button
+                   className="text-white bg-red-500 hover:bg-red-600"
+                   size="sm"
+                   onClick={() => setDeleteModalOpen(true)}
+                 >
+                   <Trash2 className="w-4 h-4 mr-2" />
+                   Deletar Selecionados
+                 </Button>
+               </div>
+             </div>
+           )}
 
-          {state.data && state.data.items.length === 0 && (
+           {state.data && state.data.items.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               Nenhum certificado encontrado
             </div>
@@ -379,104 +334,104 @@ export default function CertificatesPage() {
             <>
               <div className="rounded-md border overflow-x-auto">
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">
-                        <Checkbox
-                          checked={!!allSelected}
-                          onCheckedChange={handleSelectAll}
-                        />
-                      </TableHead>
-                      <TableHead>Aluno</TableHead>
-                      <TableHead>CPF</TableHead>
-                      <TableHead>Curso</TableHead>
-                      <TableHead>Carga Horária</TableHead>
-                      <TableHead>Conclusão</TableHead>
-                      <TableHead>Registro</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
+                   <TableHeader>
+                     <TableRow>
+                       <TableHead className="w-12">
+                         <Checkbox
+                           checked={!!allSelected}
+                           onCheckedChange={handleSelectAll}
+                         />
+                       </TableHead>
+                       <TableHead>Aluno</TableHead>
+                       <TableHead>CPF</TableHead>
+                       <TableHead>Curso</TableHead>
+                       <TableHead>Carga Horária</TableHead>
+                       <TableHead>Conclusão</TableHead>
+                       <TableHead>Registro</TableHead>
+                       <TableHead className="text-right">Ações</TableHead>
+                     </TableRow>
+                   </TableHeader>
                   <TableBody>
                     {state.data.items.map((certificate: any) => (
-                      <TableRow key={certificate.id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedCertificates.includes(certificate.id)}
-                            onCheckedChange={(checked: boolean) =>
-                              handleSelectCertificate(certificate.id, checked as boolean)
-                            }
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">{certificate.studentName}</TableCell>
-                        <TableCell>{formatCPF(certificate.cpf)}</TableCell>
-                        <TableCell>{certificate.courseName}</TableCell>
-                        <TableCell>{certificate.workload}h</TableCell>
-                        <TableCell>{formatDate(certificate.completionDate)}</TableCell>
-                        <TableCell className="text-sm text-gray-600">
-                          {certificate.registrationNumber}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {/* Download individual on-demand */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                handleDownloadSingle(certificate.id, certificate.studentName)
-                              }
-                              disabled={downloadingId === certificate.id}
-                              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                            >
-                              {downloadingId === certificate.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <Download className="w-4 h-4" />
-                              )}
-                              <span className="ml-1 text-sm">PDF</span>
-                            </Button>
+                       <TableRow key={certificate.id}>
+                         <TableCell>
+                           <Checkbox
+                             checked={selectedCertificates.includes(certificate.id)}
+                             onCheckedChange={(checked: boolean) =>
+                               handleSelectCertificate(certificate.id, checked as boolean)
+                             }
+                           />
+                         </TableCell>
+                         <TableCell className="font-medium">{certificate.studentName}</TableCell>
+                         <TableCell>{formatCPF(certificate.cpf)}</TableCell>
+                         <TableCell>{certificate.courseName}</TableCell>
+                         <TableCell>{certificate.workload}h</TableCell>
+                         <TableCell>{formatDate(certificate.completionDate)}</TableCell>
+                         <TableCell className="text-sm text-gray-600">
+                           {certificate.registrationNumber}
+                         </TableCell>
+                         <TableCell className="text-right">
+                           <div className="flex items-center justify-end gap-2">
+                             {/* Download individual on-demand */}
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() =>
+                                 handleDownloadSingle(certificate.id, certificate.studentName)
+                               }
+                               disabled={downloadingId === certificate.id}
+                               className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                             >
+                               {downloadingId === certificate.id ? (
+                                 <Loader2 className="w-4 h-4 animate-spin" />
+                               ) : (
+                                 <Download className="w-4 h-4" />
+                               )}
+                               <span className="ml-1 text-sm">PDF</span>
+                             </Button>
 
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <MoreVertical className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  className="cursor-pointer"
-                                  onClick={() => {
-                                    setSelectedCertificateData(certificate);
-                                    setViewModalOpen(true);
-                                  }}
-                                >
-                                  <Eye className="w-4 h-4 mr-2" />
-                                  Visualizar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="cursor-pointer"
-                                  onClick={() => {
-                                    setSelectedCertificateData(certificate);
-                                    setUpdateModalOpen(true);
-                                  }}
-                                >
-                                  <Edit className="w-4 h-4 mr-2" />
-                                  Editar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="cursor-pointer text-red-600 focus:text-red-600"
-                                  onClick={() => {
-                                    setCertificateToDelete(certificate.id);
-                                    setDeleteSingleModalOpen(true);
-                                  }}
-                                >
-                                  <Trash2 className="w-4 h-4 mr-2" />
-                                  Deletar
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                             <DropdownMenu>
+                               <DropdownMenuTrigger asChild>
+                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                   <MoreVertical className="w-4 h-4" />
+                                 </Button>
+                               </DropdownMenuTrigger>
+                               <DropdownMenuContent align="end">
+                                 <DropdownMenuItem
+                                   className="cursor-pointer"
+                                   onClick={() => {
+                                     setSelectedCertificateData(certificate);
+                                     setViewModalOpen(true);
+                                   }}
+                                 >
+                                   <Eye className="w-4 h-4 mr-2" />
+                                   Visualizar
+                                 </DropdownMenuItem>
+                                 <DropdownMenuItem
+                                   className="cursor-pointer"
+                                   onClick={() => {
+                                     setSelectedCertificateData(certificate);
+                                     setUpdateModalOpen(true);
+                                   }}
+                                 >
+                                   <Edit className="w-4 h-4 mr-2" />
+                                   Editar
+                                 </DropdownMenuItem>
+                                 <DropdownMenuItem
+                                   className="cursor-pointer text-red-600 focus:text-red-600"
+                                   onClick={() => {
+                                     setCertificateToDelete(certificate.id);
+                                     setDeleteSingleModalOpen(true);
+                                   }}
+                                 >
+                                   <Trash2 className="w-4 h-4 mr-2" />
+                                   Deletar
+                                 </DropdownMenuItem>
+                               </DropdownMenuContent>
+                             </DropdownMenu>
+                           </div>
+                         </TableCell>
+                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>

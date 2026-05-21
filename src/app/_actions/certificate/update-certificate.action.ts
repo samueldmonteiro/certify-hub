@@ -2,6 +2,7 @@
 
 import { certificateServiceFactory } from '@/src/core/factories/service.factory';
 import { revalidatePath } from 'next/cache';
+import { CertificateType } from '@/src/core/enums/certificate-type.enum';
 
 export async function updateCertificateAction(id: string, data: {
   studentName?: string;
@@ -9,11 +10,10 @@ export async function updateCertificateAction(id: string, data: {
   cpf?: string;
   workload?: number;
   completionDate?: Date;
-  message?: string;
   page?: string;
   ptsBook?: string;
   registrationNumber?: string;
-
+  type?: CertificateType;
 }): Promise<{ success: boolean; message: string }> {
   try {
 
@@ -27,6 +27,7 @@ export async function updateCertificateAction(id: string, data: {
       page: data.page,
       ptsBook: data.ptsBook,
       registrationNumber: data.registrationNumber,
+      type: data.type,
     });
 
     revalidatePath('/dashboard/certificados');

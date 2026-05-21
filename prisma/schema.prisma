@@ -24,7 +24,7 @@ model Certificate {
   workload           Int
   completionDate     DateTime
   page               String
-  registrationNumber String          @unique
+  registrationNumber String
   ptsBook            String
   createdAt          DateTime        @default(now())
   type               CertificateType
@@ -36,6 +36,9 @@ enum CertificateType {
   BRIGADISTA
   CIPEIRO
   DIRECAO_DEFENSIVA
+  NR06_EPI
+  BENZENO_NR20
+  DIRECAO_4X4
 }
 
 model CertificateSequence {

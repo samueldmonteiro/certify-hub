@@ -1,6 +1,7 @@
 import { X, Download, User, BookOpen, Calendar, Clock, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useState } from 'react';
+import { CertificateTypeLabels } from '@/src/core/enums/certificate-type.enum';
 
 interface ViewCertificateModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ export function ViewCertificateModal({
     }
   };
 
+  const typeLabel = CertificateTypeLabels[certificate.type as keyof typeof CertificateTypeLabels] || certificate.type;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-background text-foreground rounded-xl shadow-lg border border-border w-full max-w-lg overflow-hidden flex flex-col">
@@ -57,10 +60,13 @@ export function ViewCertificateModal({
               <h3 className="text-lg font-bold">{certificate.studentName}</h3>
               <p className="text-sm text-muted-foreground mt-1">CPF: {certificate.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</p>
             </div>
-            <div className="text-right">
+            <div className="text-right space-y-1">
               <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                 Reg: {certificate.registrationNumber}
               </span>
+              <div className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ml-1">
+                {typeLabel}
+              </div>
             </div>
           </div>
 
@@ -94,13 +100,6 @@ export function ViewCertificateModal({
               <p className="font-medium">{formatDate(certificate.createdAt)}</p>
             </div>
           </div>
-
-          {certificate.message && (
-            <div className="bg-muted rounded-lg p-4 border border-border">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">Mensagem Personalizada</p>
-              <p className="text-sm italic">&quot;{certificate.message}&quot;</p>
-            </div>
-          )}
 
           <div className="flex gap-2 text-xs text-muted-foreground pt-2 flex-wrap items-center">
             <span>Página: <strong className="text-foreground">{certificate.page}</strong></span>

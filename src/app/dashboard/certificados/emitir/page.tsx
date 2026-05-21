@@ -8,9 +8,10 @@ import StudentTable from '@/src/app/_components/generate-certificate/student-tab
 import SingleStudentForm from '@/src/app/_components/generate-certificate/single-student-form';
 import RegisterButton from '@/src/app/_components/generate-certificate/register-button';
 import { Alert } from '@/src/app/_components/custom/alert';
-import { RegisterCertificatesResponse } from '@/src/app/api/certificates/generate/route';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { RegisterCertificateRequest } from '@/src/core/services/register-certificate-data.service';
+import { CertificateType } from '@/src/core/enums/certificate-type.enum';
+import { RegisterCertificatesResponse } from '@/src/app/api/certificates/generate/route';
 
 function RegistrationSuccessModal({
   isOpen,
@@ -233,6 +234,12 @@ export default function CertificadosEmitirPage() {
   const [registeredCount, setRegisteredCount] = useState(0);
   const [studentsDataError, setStudentsDataError] = useState<string | null>(null);
 
+  const searchParams = useSearchParams();
+  const certificateType =
+    (Object.values(CertificateType) as string[]).includes(searchParams.get('tipo') ?? '')
+      ? (searchParams.get('tipo') as CertificateType)
+      : CertificateType.BRIGADISTA;
+
   const handleFileProcessed = (data: RegisterCertificateRequest[]) => {
     setStudents(data);
     setSelectedStudents([]);
@@ -296,7 +303,7 @@ export default function CertificadosEmitirPage() {
 
         const result = await res.json() as RegisterCertificatesResponse;
 
-        if (result.errors || !result.success) {
+        if (!result.success) {
           const errorMsg =
             getFirstZodError(result.errors) || result.message || 'Erro desconhecido ao cadastrar';
           const studentName = batch[0]?.studentName || 'Aluno desconhecido';
@@ -369,7 +376,7 @@ export default function CertificadosEmitirPage() {
       await new Promise(resolve => setTimeout(resolve, 300));
       setIsRegistering(false);
 
-      if (response.errors || !response.success) {
+      if (!response.success) {
         const errorMsg =
           getFirstZodError(response.errors) || response.message || 'Erro desconhecido';
         setErrorMessage(errorMsg);
@@ -414,7 +421,10 @@ export default function CertificadosEmitirPage() {
         </TabsList>
 
         <TabsContent value="upload" className="space-y-6">
-          <FileUploadSection onFileProcessed={handleFileProcessed} />
+          <FileUploadSection
+            onFileProcessed={handleFileProcessed}
+            certificateType={certificateType}
+          />
 
           {students.length > 0 && (
             <>
@@ -443,6 +453,7 @@ export default function CertificadosEmitirPage() {
           <SingleStudentForm
             onSubmit={handleRegisterSingle}
             isRegistering={isRegistering}
+            certificateType={certificateType}
           />
         </TabsContent>
       </Tabs>

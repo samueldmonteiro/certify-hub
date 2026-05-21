@@ -9,6 +9,8 @@ import { prisma } from '@/src/lib/prisma';
 import { CertificateMapper } from '../../mappers/certificate.mapper';
 import { CertificateSequenceMapper } from '../../mappers/certificate-sequence.mapper';
 import { CertificateWhereInput } from '@/src/generated/prisma/models';
+import { RegistrationNumber } from '../../value-objects/registration-number.value-object';
+import { CertificatePage } from '../../value-objects/certificate-page.value-object';
 
 export class PrismaCertificateRepository implements ICertificateRepository {
 
@@ -43,14 +45,36 @@ export class PrismaCertificateRepository implements ICertificateRepository {
 
   async createMany(certificates: Certificate[], sequence: CertificateSequence): Promise<void> {
     await prisma.$transaction(async (tx) => {
-      // Usando create em loop para garantir que erros individuais
-      // estourem a transação e causem rollback de tudo
+      // Re-lê a sequência dentro da transação para evitar condição de corrida
+      const freshSeq = await tx.certificateSequence.findUnique({
+        where: {
+          type_year: {
+            type: sequence.type as any,
+            year: sequence.year,
+          },
+        },
+      });
+
+      if (!freshSeq) {
+        throw new Error('Sequence not found for type/year');
+      }
+
+      let index = freshSeq.lastRegistrationIndex;
+
       for (const cert of certificates) {
+        index += 1;
+
+        const regNumber = `${String(index).padStart(4, '0')}/${sequence.year}`;
+        const pageIndex = Math.ceil(index / 50);
+        const page = `${String(pageIndex).padStart(3, '0')}/${sequence.year}`;
+
+        cert.changeRegistrationNumber(new RegistrationNumber(regNumber));
+        cert.changePage(new CertificatePage(page));
+
         const data = CertificateMapper.toPrismaCreate(cert);
         await tx.certificate.create({ data });
       }
 
-      const sequencePrisma = CertificateSequenceMapper.toPrismaUpdate(sequence);
       await tx.certificateSequence.update({
         where: {
           type_year: {
@@ -58,7 +82,7 @@ export class PrismaCertificateRepository implements ICertificateRepository {
             year: sequence.year,
           },
         },
-        data: sequencePrisma,
+        data: { lastRegistrationIndex: index },
       });
     });
   }

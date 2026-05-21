@@ -11,16 +11,15 @@ import { CertificateType } from '@/src/core/enums/certificate-type.enum';
 interface SingleStudentFormProps {
   onSubmit: (student: RegisterCertificateRequest) => void;
   isRegistering: boolean;
+  certificateType: CertificateType;
 }
 
-export default function SingleStudentForm({ onSubmit, isRegistering }: SingleStudentFormProps) {
+export default function SingleStudentForm({ onSubmit, isRegistering, certificateType }: SingleStudentFormProps) {
   const [formData, setFormData] = useState({
     studentName: '',
     cpf: '',
     completionDate: '',
-    courseName: 'Brigada de Incêndio e Emergência',
-    workload: '8',
-    message: '',
+    hours: 8,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,9 +27,9 @@ export default function SingleStudentForm({ onSubmit, isRegistering }: SingleStu
     onSubmit({
       cpf: formData.cpf,
       studentName: formData.studentName,
-      hours: Number(formData.workload),
+      hours: Number(formData.hours),
       date: new Date(formData.completionDate),
-      type: CertificateType.BRIGADISTA,
+      type: certificateType,
     });
   };
 
@@ -63,71 +62,41 @@ export default function SingleStudentForm({ onSubmit, isRegistering }: SingleStu
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                id="cpf"
-                name="cpf"
-                value={formData.cpf}
-                onChange={handleChange}
-                placeholder="000.000.000-00"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="completionDate">Data de Conclusão</Label>
-              <Input
-                id="completionDate"
-                name="completionDate"
-                type="date"
-                value={formData.completionDate}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-3 space-y-2">
-              <Label htmlFor="courseName">Nome do Curso</Label>
-              <Input
-                id="courseName"
-                name="courseName"
-                value={formData.courseName}
-                onChange={handleChange}
-                placeholder="Nome do Curso"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="workload">Carga Horária (horas)</Label>
-              <Input
-                id="workload"
-                name="workload"
-                type="number"
-                min="1"
-                value={formData.workload}
-                onChange={handleChange}
-                required
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="cpf">CPF</Label>
+            <Input
+              id="cpf"
+              name="cpf"
+              value={formData.cpf}
+              onChange={handleChange}
+              placeholder="000.000.000-00"
+              required
+            />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message">Mensagem Personalizada (Opcional)</Label>
+            <Label htmlFor="completionDate">Data de Conclusão</Label>
             <Input
-              id="message"
-              name="message"
-              value={formData.message}
+              id="completionDate"
+              name="completionDate"
+              type="date"
+              value={formData.completionDate}
               onChange={handleChange}
-              placeholder="Ex: Treinamento realizado em conformidade com a NR-23"
+              required
             />
-            <p className="text-xs text-muted-foreground">
-              Esta mensagem aparecerá no corpo do certificado. Deixe em branco para usar o padrão.
-            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="hours">Carga Horária (horas)</Label>
+            <Input
+              id="hours"
+              name="hours"
+              type="number"
+              min="1"
+              value={formData.hours}
+              onChange={handleChange}
+              required
+            />
           </div>
 
           <Button type="submit" className="w-full" disabled={isRegistering}>

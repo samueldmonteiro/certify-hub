@@ -10,9 +10,10 @@ import { CertificateType } from '@/src/core/enums/certificate-type.enum';
 
 interface FileUploadSectionProps {
   onFileProcessed: (data: RegisterCertificateRequest[]) => void;
+  certificateType: CertificateType;
 }
 
-export default function FileUploadSection({ onFileProcessed }: FileUploadSectionProps) {
+export default function FileUploadSection({ onFileProcessed, certificateType }: FileUploadSectionProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -72,23 +73,26 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
 
     try {
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { cellDates: false }); // lê datas como raw para controlarmos o parse
+      const workbook = XLSX.read(data, { cellDates: false });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+      // A tabela começa na linha 7 (index 6, 0-based), header na linha 7
+      // range começa em 6 (0-based) para capturar o header na linha 7
       const jsonData = XLSX.utils.sheet_to_json(worksheet, {
         raw: false,
         dateNF: 'dd/mm/yyyy',
+        range: 6, // pula as linhas 1-6 (logo, curso, separadores)
       });
 
-      // Validação dos dados
       const students: RegisterCertificateRequest[] = [];
       const errors: string[] = [];
 
       jsonData.forEach((row: any, index: number) => {
-        const rowNum = index + 2; // +2 porque começa do 1 e tem o header
+        const rowNum = index + 8; // linha 8 = primeiro aluno na planilha
         const rowErrors: string[] = [];
 
         // 1. Validar Nome
-        if (!row.NOME_ALUNO || String(row.NOME_ALUNO).trim().length < 2) {
+        if (!row['NOME DO ALUNO'] || String(row['NOME DO ALUNO']).trim().length < 2) {
           rowErrors.push('Nome ausente ou curto demais');
         }
 
@@ -99,46 +103,55 @@ export default function FileUploadSection({ onFileProcessed }: FileUploadSection
         }
 
         // 3. Validar Duração
-        const workload = Number(row.DURACAO_CURSO_HRS);
-        if (!row.DURACAO_CURSO_HRS || isNaN(workload) || workload <= 0) {
-          rowErrors.push(`Duração/Workload inválida: '${row.DURACAO_CURSO_HRS || ''}'`);
+        const rawWorkload = String(row['DURAÇÃO DO CURSO (HRS)'] || '').replace(/h$/i, '').trim();
+        const workload = Number(rawWorkload);
+        if (!rawWorkload || isNaN(workload) || workload <= 0) {
+          rowErrors.push(`Duração inválida: '${row['DURAÇÃO DO CURSO (HRS)'] || ''}'`);
         }
 
         // 4. Validar Data
-        const dateStr = String(row.DATA_CONCLUSAO || '').trim();
+        const dateStr = String(row['DATA DE CONCLUSÃO'] || '').trim();
         const parsedDate = parseBrDate(dateStr);
-        console.log(dateStr, parsedDate);
         if (!dateStr || !parsedDate) {
           rowErrors.push(`Data inválida: '${dateStr}' (formato esperado: DD/MM/YY ou DD/MM/YYYY)`);
         }
 
+        // 5. Ignorar linhas totalmente vazias (IDs preenchidos automaticamente podem gerar rows)
+        const isEmpty =
+          !row['NOME DO ALUNO'] &&
+          !row.CPF &&
+          !row['DURAÇÃO DO CURSO (HRS)'] &&
+          !row['DATA DE CONCLUSÃO'];
+        if (isEmpty) return;
+
         if (rowErrors.length > 0) {
           errors.push(`Linha ${rowNum}: ${rowErrors.join(', ')}`);
         } else {
-          // Se não houver erros na linha, adiciona ao array de sucesso
           students.push({
-            studentName: String(row.NOME_ALUNO).trim(),
+            studentName: String(row['NOME DO ALUNO']).trim(),
             cpf: cpfStr,
             date: parsedDate!,
             hours: workload,
-            type: CertificateType.BRIGADISTA,
+            type: certificateType,
           });
         }
       });
 
       if (errors.length > 0) {
-        setError(`Foram encontrados erros na planilha:\n\n${errors.slice(0, 15).join('\n')}${errors.length > 15 ? `\n... e mais ${errors.length - 15} erros.` : ''}`);
+        setError(
+          `Foram encontrados erros na planilha:\n\n${errors.slice(0, 15).join('\n')}${errors.length > 15 ? `\n... e mais ${errors.length - 15} erros.` : ''
+          }`,
+        );
         setIsLoading(false);
         return;
       }
 
       if (students.length === 0) {
-        setError('Nenhum dado válido encontrado no arquivo. Certifique-se de que as colunas são: nome, cpf, completionDate');
+        setError('Nenhum dado válido encontrado. Certifique-se de preencher ao menos um aluno.');
         setIsLoading(false);
         return;
       }
 
-      // Simula carregamento
       await new Promise(resolve => setTimeout(resolve, 500));
 
       console.log('STUDENTS', students);

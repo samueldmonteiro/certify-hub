@@ -4,7 +4,6 @@ import { UserViewModel } from '@/src/core/entities/user.entity';
 import { authServiceFactory } from '@/src/core/factories/service.factory';
 import { LoginErrorsSchema, LoginSchema } from '@/src/core/validations/login.schema';
 import { createSession } from '@/src/lib/session';
-import z from 'zod';
 
 export interface LoginActionResponse {
   success: boolean,
@@ -21,7 +20,7 @@ export const loginAction = async (_prevState: any, formData: FormData): Promise<
   if (!parsed.success) {
     return {
       success: false,
-      errors: z.formatError(parsed.error),
+      errors: parsed.error.format(),
     };
   }
 
