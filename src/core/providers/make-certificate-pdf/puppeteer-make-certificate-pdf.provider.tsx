@@ -80,7 +80,7 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
         // Ignora erro e usa versão hardcoded como fallback
       }
 
-      const packUrl = `https://github.com/Sparticuz/chromium/releases/download/v${version}/chromium-v${version}-pack.tar`;
+      const packUrl = 'https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar';
       return await chromium.executablePath(packUrl);
     }
 
