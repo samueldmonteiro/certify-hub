@@ -5,9 +5,11 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/api/certificates/[id]/download': [
       './node_modules/@sparticuz/chromium/**/*',
+      './node_modules/.pnpm/@sparticuz+chromium@*/node_modules/@sparticuz/chromium/**/*',
     ],
     '/api/certificates/batch-download': [
       './node_modules/@sparticuz/chromium/**/*',
+      './node_modules/.pnpm/@sparticuz+chromium@*/node_modules/@sparticuz/chromium/**/*',
     ],
   },
 };
