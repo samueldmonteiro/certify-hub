@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -20,37 +20,21 @@ export function UpdateCertificateModal({
   onUpdate,
   certificate,
 }: UpdateCertificateModalProps) {
-  const [formData, setFormData] = useState({
-    studentName: '',
-    cpf: '',
-    courseName: '',
-    workload: '',
-    completionDate: '',
-    page: '',
-    ptsBook: '',
-    registrationNumber: '',
-    type: CertificateType.BRIGADISTA,
-  });
+  const [formData, setFormData] = useState(() => ({
+    studentName: certificate?.studentName || '',
+    cpf: certificate?.cpf || '',
+    courseName: certificate?.courseName || '',
+    workload: certificate?.workload ? String(certificate.workload) : '',
+    completionDate: certificate?.completionDate
+      ? new Date(certificate.completionDate).toISOString().split('T')[0]
+      : '',
+    page: certificate?.page || '',
+    ptsBook: certificate?.ptsBook || '',
+    registrationNumber: certificate?.registrationNumber || '',
+    type: certificate?.type || CertificateType.BRIGADISTA,
+  }));
 
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (certificate) {
-      setFormData({
-        studentName: certificate.studentName || '',
-        cpf: certificate.cpf || '',
-        courseName: certificate.courseName || '',
-        workload: certificate.workload ? String(certificate.workload) : '',
-        completionDate: certificate.completionDate
-          ? new Date(certificate.completionDate).toISOString().split('T')[0]
-          : '',
-        page: certificate.page || '',
-        ptsBook: certificate.ptsBook || '',
-        registrationNumber: certificate.registrationNumber || '',
-        type: certificate.type || CertificateType.BRIGADISTA,
-      });
-    }
-  }, [certificate]);
 
   if (!isOpen || !certificate) return null;
 
