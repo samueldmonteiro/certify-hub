@@ -5,8 +5,8 @@ import path from 'path';
 export interface CertificateContent {
   frontDescription: (studentName: string, cpf: string, date: string, hours: number) => string;
   programmaticContent: string;
-  legalTextRight: string;
-  validityText: string;
+  legalTextRight?: string;
+  validityText?: string;
   signature1Image: string;
   signature2Image: string;
   signature1Text: string;
@@ -63,27 +63,7 @@ const signature2_LucianaValeska = `
 const sig1Image = imageToBase64(path.join(process.cwd(), 'src/app/assets/assinatura_1.png'));
 const sig2Image = imageToBase64(path.join(process.cwd(), 'src/app/assets/assinatura_2.png'));
 
-// ─── Template genérico ────────────────────────────────────────────────────────
-
-const genericTemplate: CertificateContent = {
-  name: 'Genérico',
-  frontDescription: (studentName, cpf, date, hours) => `
-    CPF: <strong>${cpf}</strong>, participou do treinamento de <strong>${CertificateTypeLabels[CertificateType.BRIGADISTA]}</strong>, no dia <strong>${date}</strong>, com carga horária de <strong>${hours}h</strong>, tendo seu aproveitamento satisfatório.
-  `,
-  programmaticContent: `
-    <h2>CONTEÚDO PROGRAMÁTICO :</h2>
-    <ul>
-      <li>Conteúdo geral do curso.</li>
-    </ul>
-    <strong class="workload">CARGA HORÁRIA TOTAL : 08 HORAS</strong>
-  `,
-  legalTextRight: 'Conforme legislação vigente',
-  validityText: 'Este certificado tem validade para prova de títulos, fins curriculares e demais utilidades.',
-  signature1Text: signature1_RodrigoMarcio,
-  signature2Text: signature2_LourivalNeto,
-  signature1Image: sig1Image,
-  signature2Image: sig2Image,
-};
+const sigLucianaImage = imageToBase64(path.join(process.cwd(), 'src/app/assets/assinatura_luciana.png'));
 
 // ─── Mapa de certificados ─────────────────────────────────────────────────────
 
@@ -176,13 +156,11 @@ export const certificateContents: Record<CertificateType, CertificateContent> = 
       </ul>
       <strong class="workload">CARGA HORÁRIA TOTAL : 08 HORAS</strong>
     `,
-    legalTextRight: 'CTB — Código de Trânsito Brasileiro',
-    validityText:
-      'Este certificado tem validade para comprovação de treinamento, fins curriculares e demais utilidades na qualidade de treinamento de Direção Defensiva, não podendo ser utilizado para outros fins.',
+
     signature1Text: signature1_LourivalTransito,
     signature2Text: signature2_LucianaValeska,
-    signature1Image: sig1Image,
-    signature2Image: sig2Image,
+    signature1Image: sig2Image,
+    signature2Image: sigLucianaImage,
   },
 
   // ── #3 · NR-06 — USO DE EPI (Inflamáveis/Combustíveis) ─────────────────────
@@ -314,13 +292,10 @@ export const certificateContents: Record<CertificateType, CertificateContent> = 
       </ul>
       <strong class="workload">CARGA HORÁRIA TOTAL : 08 HORAS</strong>
     `,
-    legalTextRight: 'CTB — Código de Trânsito Brasileiro',
-    validityText:
-      'Este certificado tem validade para comprovação de treinamento, fins curriculares e demais utilidades na qualidade de treinamento de Direção Defensiva e Operacional para Veículos 4×4 em Áreas Remotas, não podendo ser utilizado para outros fins.',
     signature1Text: signature1_LourivalTransito,
     signature2Text: signature2_LucianaValeska,
-    signature1Image: sig1Image,
-    signature2Image: sig2Image,
+    signature1Image: sig2Image,
+    signature2Image: sigLucianaImage,
   },
 
   // ── Brigadista (mantido do template original) ────────────────────────────────

@@ -70,16 +70,7 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
 
     // Em produção (Vercel), usar a URL externa do pack para evitar erros de binário ausente
     if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-      let version = '143.0.4';
-      try {
-        const _require = createRequire(fileURLToPath(import.meta.url));
-        const pkgPath = _require.resolve('@sparticuz/chromium/package.json');
-        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
-        version = pkg.version;
-      } catch {
-        // Ignora erro e usa versão hardcoded como fallback
-      }
-
+      
       const packUrl = 'https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar';
       return await chromium.executablePath(packUrl);
     }

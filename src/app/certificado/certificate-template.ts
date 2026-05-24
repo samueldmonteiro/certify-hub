@@ -327,6 +327,7 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
         display: block;
         margin-bottom: -10px;
       }
+
     </style>
   </head>
 
@@ -367,7 +368,7 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
           <img src="${seloSrc}" class="seal" alt="Selo Best Quality" />
           ${signature1HTML}
         </div>
-        <div class="signature">
+        <div class="signature sig2">
           ${signature2HTML}
         </div>
       </div>
@@ -410,13 +411,15 @@ export function generateCertificateHTML(data: CertificateTemplateProps): string 
           <p>Folha ${page}</p>
           <p>Livro PTS ${ptsBook}</p>
         </div>
+        ${content.legalTextRight ? `
         <div class="box">
           <strong>Certificado emitido conforme</strong>
           ${content.legalTextRight}
-        </div>
+        </div>` : ''}
+        ${content.validityText ? `
         <div class="box small-text">
           ${content.validityText}
-        </div>
+        </div>` : ''}
       </div>
     </div>
   </body>
