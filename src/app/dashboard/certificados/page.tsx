@@ -12,6 +12,7 @@ import {
   Loader2,
   Edit,
   Eye,
+  FolderArchive,
 } from 'lucide-react';
 import { Input } from '@/src/app/_components/ui/input';
 import { Button } from '@/src/app/_components/ui/button';
@@ -77,6 +78,7 @@ export default function CertificatesPage() {
 
   // Download state
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadingZip, setDownloadingZip] = useState(false);
 
   // Modal states for view/update
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
@@ -173,6 +175,37 @@ export default function CertificatesPage() {
       startTransition(() => formAction(filters));
     } else {
       setDeleteMessage({ type: 'error', text: result.message });
+    }
+  };
+
+  /** Download ZIP com múltiplos certificados */
+  const handleDownloadZip = async () => {
+    if (selectedCertificates.length === 0) return;
+    setDownloadingZip(true);
+    try {
+      const res = await fetch('/api/certificates/download-zip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedCertificates }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Erro ao gerar ZIP');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const today = new Date().toISOString().slice(0, 10);
+      link.download = `certificados_${today}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error: any) {
+      setDeleteMessage({ type: 'error', text: error.message || 'Erro ao baixar ZIP.' });
+    } finally {
+      setDownloadingZip(false);
     }
   };
 
@@ -312,6 +345,19 @@ export default function CertificatesPage() {
                 {selectedCertificates.length} certificado(s) selecionado(s)
               </span>
               <div className="flex gap-2">
+                <Button
+                  className="text-white bg-blue-600 hover:bg-blue-700"
+                  size="sm"
+                  onClick={handleDownloadZip}
+                  disabled={downloadingZip}
+                >
+                  {downloadingZip ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <FolderArchive className="w-4 h-4 mr-2" />
+                  )}
+                  {downloadingZip ? 'Gerando ZIP...' : 'Baixar ZIP'}
+                </Button>
                 <Button
                   className="text-white bg-red-500 hover:bg-red-600"
                   size="sm"
