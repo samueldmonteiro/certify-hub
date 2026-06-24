@@ -22,6 +22,7 @@ import {
   GraduationCap,
   FileText,
   Download,
+  MessageSquare,
 } from 'lucide-react';
 import { UserViewModel } from '@/src/core/entities/user.entity';
 
@@ -41,6 +42,11 @@ export const data = {
       title: 'Certificados Emitidos',
       url: '/dashboard/certificados',
       icon: FileText,
+    },
+    {
+      title: 'Feedbacks de Alunos',
+      url: '/dashboard/feedbacks',
+      icon: MessageSquare,
     },
     {
       title: 'Baixar Planilha',

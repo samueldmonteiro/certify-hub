@@ -50,3 +50,14 @@ model CertificateSequence {
   @@id([type, year])
   @@map("certificate_sequences")
 }
+
+model Feedback {
+  id          String          @id @default(uuid())
+  studentName String
+  course      CertificateType
+  stars       Int
+  message     String          @db.Text
+  createdAt   DateTime        @default(now())
+
+  @@map("feedbacks")
+}
