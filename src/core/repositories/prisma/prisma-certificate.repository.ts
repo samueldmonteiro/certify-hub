@@ -7,7 +7,6 @@ import {
 } from '../certificate.repository';
 import { prisma } from '@/src/lib/prisma';
 import { CertificateMapper } from '../../mappers/certificate.mapper';
-import { CertificateSequenceMapper } from '../../mappers/certificate-sequence.mapper';
 import { CertificateWhereInput } from '@/src/generated/prisma/models';
 import { RegistrationNumber } from '../../value-objects/registration-number.value-object';
 import { CertificatePage } from '../../value-objects/certificate-page.value-object';

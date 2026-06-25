@@ -17,6 +17,7 @@ export function PublicLinkQRCode() {
   const [url, setUrl] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUrl(`${window.location.origin}/avaliar`);
   }, []);
 
@@ -54,9 +55,9 @@ export function PublicLinkQRCode() {
                 id="public-link-qrcode"
                 value={url}
                 size={220}
-                bgColor={"#ffffff"}
-                fgColor={"#000000"}
-                level={"H"}
+                bgColor={'#ffffff'}
+                fgColor={'#000000'}
+                level={'H'}
                 includeMargin={false}
               />
             )}

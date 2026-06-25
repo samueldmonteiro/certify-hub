@@ -109,10 +109,10 @@ export function FeedbackForm() {
                     >
                       <Star
                         className={cn(
-                          "w-8 h-8 transition-colors",
+                          'w-8 h-8 transition-colors',
                           (hoverStar || stars) >= star
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-muted-foreground/30 hover:text-muted-foreground"
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-muted-foreground/30 hover:text-muted-foreground',
                         )}
                       />
                     </button>

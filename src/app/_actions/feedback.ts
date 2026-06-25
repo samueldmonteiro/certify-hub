@@ -15,7 +15,7 @@ const feedbackSchema = z.object({
 
 export async function createFeedbackAction(
   prevState: any,
-  formData: FormData
+  formData: FormData,
 ) {
   try {
     const rawData = {
