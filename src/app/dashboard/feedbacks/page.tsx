@@ -6,6 +6,7 @@ import { Badge } from '@/src/app/_components/ui/badge';
 import { Button } from '@/src/app/_components/ui/button';
 import { Star, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { PublicLinkQRCode } from './_components/public-link-qrcode';
 
 export const metadata: Metadata = {
   title: 'Feedbacks | Dashboard',
@@ -25,12 +26,15 @@ export default async function FeedbacksPage() {
             Visualize e gerencie os feedbacks deixados pelos alunos nos cursos.
           </p>
         </div>
-        <Link href="/avaliar" target="_blank">
-          <Button variant="outline" className="flex items-center gap-2">
-            <ExternalLink className="w-4 h-4" />
-            Acessar Formulário Público
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <PublicLinkQRCode />
+          <Link href="/avaliar" target="_blank">
+            <Button variant="outline" className="flex items-center gap-2">
+              <ExternalLink className="w-4 h-4" />
+              Acessar Formulário Público
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Card>
