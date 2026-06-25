@@ -7,6 +7,7 @@ import { Button } from '@/src/app/_components/ui/button';
 import { Star, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { PublicLinkQRCode } from './_components/public-link-qrcode';
+import { DeleteFeedbackButton } from './_components/delete-feedback-button';
 
 export const metadata: Metadata = {
   title: 'Feedbacks | Dashboard',
@@ -59,6 +60,7 @@ export default async function FeedbacksPage() {
                     <TableHead>Curso</TableHead>
                     <TableHead>Avaliação</TableHead>
                     <TableHead>Mensagem</TableHead>
+                    <TableHead className="w-[80px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -87,6 +89,9 @@ export default async function FeedbacksPage() {
                       </TableCell>
                       <TableCell className="max-w-md truncate" title={feedback.message}>
                         {feedback.message}
+                      </TableCell>
+                      <TableCell>
+                        <DeleteFeedbackButton id={feedback.id} />
                       </TableCell>
                     </TableRow>
                   ))}

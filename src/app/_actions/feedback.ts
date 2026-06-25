@@ -3,6 +3,7 @@
 import { CertificateType } from '@/src/core/enums/certificate-type.enum';
 import { prisma } from '@/src/lib/prisma';
 import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 
 const feedbackSchema = z.object({
   studentName: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
@@ -48,6 +49,27 @@ export async function createFeedbackAction(
     return {
       success: false,
       message: 'Ocorreu um erro ao enviar seu feedback. Tente novamente mais tarde.',
+    };
+  }
+}
+
+export async function deleteFeedbackAction(id: string) {
+  try {
+    await prisma.feedback.delete({
+      where: { id },
+    });
+
+    revalidatePath('/dashboard/feedbacks');
+
+    return {
+      success: true,
+      message: 'Feedback excluído com sucesso!',
+    };
+  } catch (error) {
+    console.error('Feedback deletion error:', error);
+    return {
+      success: false,
+      message: 'Ocorreu um erro ao excluir o feedback.',
     };
   }
 }
