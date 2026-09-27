@@ -61,3 +61,27 @@ model Feedback {
 
   @@map("feedbacks")
 }
+
+model AttendanceCall {
+  id        String               @id @default(uuid())
+  name      String
+  createdAt DateTime             @default(now())
+  presences AttendancePresence[]
+
+  @@map("attendance_calls")
+}
+
+model AttendancePresence {
+  id            String          @id @default(uuid())
+  callId        String
+  call          AttendanceCall  @relation(fields: [callId], references: [id], onDelete: Cascade)
+  course        CertificateType
+  trainingDate  DateTime
+  location      String
+  studentName   String
+  cpf           String
+  branchNumber  String
+  createdAt     DateTime        @default(now())
+
+  @@map("attendance_presences")
+}

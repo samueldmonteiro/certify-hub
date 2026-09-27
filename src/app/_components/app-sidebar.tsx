@@ -23,6 +23,7 @@ import {
   FileText,
   Download,
   MessageSquare,
+  ClipboardCheck,
 } from 'lucide-react';
 import { UserViewModel } from '@/src/core/entities/user.entity';
 
@@ -47,6 +48,11 @@ export const data = {
       title: 'Feedbacks de Alunos',
       url: '/dashboard/feedbacks',
       icon: MessageSquare,
+    },
+    {
+      title: 'Chamadas de Presença',
+      url: '/dashboard/chamadas',
+      icon: ClipboardCheck,
     },
     {
       title: 'Baixar Planilha',
