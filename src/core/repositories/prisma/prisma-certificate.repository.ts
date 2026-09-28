@@ -36,6 +36,11 @@ export class PrismaCertificateRepository implements ICertificateRepository {
     return CertificateMapper.toDomain(data);
   }
 
+  async findByIds(ids: string[]): Promise<Certificate[]> {
+    const data = await prisma.certificate.findMany({ where: { id: { in: ids } } });
+    return data.map(CertificateMapper.toDomain);
+  }
+
   async create(certificate: Certificate): Promise<Certificate> {
     const certPrisma = CertificateMapper.toPrismaCreate(certificate);
     const created = await prisma.certificate.create({ data: certPrisma });

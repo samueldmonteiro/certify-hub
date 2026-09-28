@@ -1,7 +1,6 @@
 import { certificateServiceFactory } from '@/src/core/factories/service.factory';
 import { NextResponse } from 'next/server';
 import archiver from 'archiver';
-import { PassThrough } from 'node:stream';
 
 export async function POST(req: Request) {
   try {
@@ -24,38 +23,32 @@ export async function POST(req: Request) {
     const service = certificateServiceFactory();
     const pdfs = await service.generateManyPdf(body.ids);
 
-    // Build a ZIP archive in memory using archiver + PassThrough stream
-    const passthrough = new PassThrough();
     const archive = archiver('zip', { zlib: { level: 6 } });
-
-    archive.on('error', (err) => {
-      throw err;
-    });
-
-    archive.pipe(passthrough);
 
     for (const { buffer, filename } of pdfs) {
       archive.append(buffer, { name: filename });
     }
+    archive.finalize();
 
-    await archive.finalize();
-
-    // Collect the piped chunks from PassThrough
-    const chunks: Buffer[] = [];
-    for await (const chunk of passthrough) {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    }
-    const zipBuffer = Buffer.concat(chunks);
+    // Stream the ZIP straight to the response instead of buffering it into a
+    // single Buffer: Vercel Functions cap non-streaming response bodies at
+    // 4.5MB, which a 10+ certificate ZIP can easily exceed.
+    const zipStream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        archive.on('data', (chunk: Buffer) => controller.enqueue(chunk));
+        archive.on('end', () => controller.close());
+        archive.on('error', (err) => controller.error(err));
+      },
+    });
 
     const timestamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
     const zipFilename = `certificados_${timestamp}.zip`;
 
-    return new NextResponse(zipBuffer.buffer as ArrayBuffer, {
+    return new NextResponse(zipStream, {
       status: 200,
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${zipFilename}"`,
-        'Content-Length': zipBuffer.length.toString(),
       },
     });
   } catch (error: any) {

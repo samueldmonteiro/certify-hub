@@ -18,6 +18,7 @@ export interface PaginatedResult<T> {
 
 export interface ICertificateRepository {
   findById(id: string): Promise<Certificate | null>
+  findByIds(ids: string[]): Promise<Certificate[]>
   create(certificate: Certificate): Promise<Certificate>
   createMany(certificates: Certificate[], sequence: CertificateSequence): Promise<void>;
   lastCreated(): Promise<Certificate | null>

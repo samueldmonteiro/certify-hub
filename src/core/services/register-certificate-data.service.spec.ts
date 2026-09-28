@@ -9,6 +9,7 @@ const certificateRepositoryMock: Mocked<ICertificateRepository> = {
   create: vi.fn(),
   createMany: vi.fn(),
   findById: vi.fn(),
+  findByIds: vi.fn(),
   search: vi.fn(),
   lastCreated: vi.fn(),
   delete: vi.fn(),

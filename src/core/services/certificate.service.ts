@@ -101,19 +101,23 @@ export class CertificateService {
 
   async generateManyPdf(certificateIds: string[]):
     Promise<Array<{ buffer: Buffer, filename: string }>> {
-    const results: Array<{ buffer: Buffer, filename: string }> = [];
+    const certificates = await this.certificateRepository.findByIds(certificateIds);
+    const certificateById = new Map(certificates.map((certificate) => [certificate.id, certificate]));
 
-    const seen = new Map<string, number>();
-
-    for (const id of certificateIds) {
-      const certificate = await this.certificateRepository.findById(id);
-
+    const orderedCertificates: Certificate[] = certificateIds.map((id) => {
+      const certificate = certificateById.get(id);
       if (!certificate) {
         throw new ResourceNotFoundError(`Certificado ${id} não encontrado`);
       }
+      return certificate;
+    });
 
-      const buffer = await this.makeCertificatePdfProvider.generatePDF(certificate);
+    // Gera todos os PDFs reutilizando uma única instância do navegador
+    const buffers = await this.makeCertificatePdfProvider.generateManyPDF(orderedCertificates);
 
+    const seen = new Map<string, number>();
+
+    return orderedCertificates.map((certificate, index) => {
       const safeName = certificate.studentName.replace(/\s+/g, '_').toLowerCase();
       const baseFilename = `certificado_${safeName}`;
 
@@ -122,9 +126,7 @@ export class CertificateService {
       seen.set(baseFilename, count + 1);
       const filename = count === 0 ? `${baseFilename}.pdf` : `${baseFilename}_${count + 1}.pdf`;
 
-      results.push({ buffer, filename });
-    }
-
-    return results;
+      return { buffer: buffers[index], filename };
+    });
   }
 }

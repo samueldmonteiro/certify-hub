@@ -10,20 +10,6 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
     let browser;
 
     try {
-
-      // Renderizar o HTML
-      const html = generateCertificateHTML({
-        cpf: data.getCPFFormatted(),
-        date: data.completionDate,
-        hours: data.workload,
-        studentName: data.studentName,
-        registrationNumber: data?.registrationNumber?.getValue() ?? '0001/2026',
-        page: data?.page?.getValue() ?? '001/2026',
-        ptsBook: data?.ptsBook?.getValue() ?? '001/2026',
-        type: data.type,
-      });
-
-      // Lançar navegador
       const executablePath = await this.resolveExecutablePath();
 
       browser = await puppeteer.launch({
@@ -32,23 +18,7 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
         headless: true,
       });
 
-      const page = await browser.newPage();
-
-      // Definir conteúdo
-      await page.setContent(html, {
-        waitUntil: 'domcontentloaded',
-      });
-
-      // Gerar PDF
-      const pdf = await page.pdf({
-        format: 'A4',
-        landscape: true,
-        printBackground: true,
-        preferCSSPageSize: true,
-      });
-
-
-      return Buffer.from(pdf);
+      return await this.renderPdf(browser, data);
     } catch (error: any) {
       throw new FailFileCertificateGeneratorError(
         `Erro ao gerar PDF: ${error.message}`,
@@ -57,6 +27,72 @@ export class PuppeteerMakeCertificatePdfProvider implements IMakeCertificatePdfP
       if (browser) {
         await browser.close();
       }
+    }
+  }
+
+  // Reutiliza uma única instância do navegador para todos os certificados,
+  // em vez de lançar/fechar o Chromium a cada um (custo de ~1-3s por lançamento,
+  // inviável dentro do limite de execução da Vercel ao gerar vários PDFs).
+  async generateManyPDF(dataList: Certificate[]): Promise<Buffer[]> {
+    if (dataList.length === 0) return [];
+
+    let browser;
+
+    try {
+      const executablePath = await this.resolveExecutablePath();
+
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        executablePath,
+        headless: true,
+      });
+
+      const buffers: Buffer[] = [];
+      for (const data of dataList) {
+        buffers.push(await this.renderPdf(browser, data));
+      }
+
+      return buffers;
+    } catch (error: any) {
+      throw new FailFileCertificateGeneratorError(
+        `Erro ao gerar PDFs: ${error.message}`,
+      );
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
+    }
+  }
+
+  private async renderPdf(browser: Awaited<ReturnType<typeof puppeteer.launch>>, data: Certificate): Promise<Buffer> {
+    const html = generateCertificateHTML({
+      cpf: data.getCPFFormatted(),
+      date: data.completionDate,
+      hours: data.workload,
+      studentName: data.studentName,
+      registrationNumber: data?.registrationNumber?.getValue() ?? '0001/2026',
+      page: data?.page?.getValue() ?? '001/2026',
+      ptsBook: data?.ptsBook?.getValue() ?? '001/2026',
+      type: data.type,
+    });
+
+    const page = await browser.newPage();
+
+    try {
+      await page.setContent(html, {
+        waitUntil: 'domcontentloaded',
+      });
+
+      const pdf = await page.pdf({
+        format: 'A4',
+        landscape: true,
+        printBackground: true,
+        preferCSSPageSize: true,
+      });
+
+      return Buffer.from(pdf);
+    } finally {
+      await page.close();
     }
   }
 
