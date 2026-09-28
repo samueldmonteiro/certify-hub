@@ -4,23 +4,24 @@ import { useState } from 'react';
 import { Button } from '@/src/app/_components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/app/_components/ui/tooltip';
 import { Trash2 } from 'lucide-react';
-import { deleteAttendanceCallAction } from '@/src/app/_actions/attendance';
+import { deleteAttendancePresenceAction } from '@/src/app/_actions/attendance';
 import { toast } from 'sonner';
 
-interface DeleteAttendanceCallButtonProps {
+interface DeleteAttendancePresenceButtonProps {
   id: string;
+  callId: string;
 }
 
-export function DeleteAttendanceCallButton({ id }: DeleteAttendanceCallButtonProps) {
+export function DeleteAttendancePresenceButton({ id, callId }: DeleteAttendancePresenceButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm('Tem certeza que deseja excluir esta chamada? Todos os registros de presença vinculados a ela também serão excluídos. Esta ação não pode ser desfeita.')) {
+    if (!confirm('Tem certeza que deseja excluir este registro de presença? Esta ação não pode ser desfeita.')) {
       return;
     }
 
     setIsDeleting(true);
-    const result = await deleteAttendanceCallAction(id);
+    const result = await deleteAttendancePresenceAction(id, callId);
 
     if (result.success) {
       toast.success(result.message);
@@ -44,7 +45,7 @@ export function DeleteAttendanceCallButton({ id }: DeleteAttendanceCallButtonPro
           <span className="sr-only">Excluir</span>
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Excluir chamada</TooltipContent>
+      <TooltipContent>Excluir registro de presença</TooltipContent>
     </Tooltip>
   );
 }

@@ -1,12 +1,15 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/src/lib/prisma';
+import { getBaseUrl } from '@/src/lib/base-url';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/app/_components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/src/app/_components/ui/table';
 import { Button } from '@/src/app/_components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/app/_components/ui/tooltip';
 import { Users } from 'lucide-react';
 import { CreateAttendanceCallDialog } from './_components/create-attendance-call-dialog';
-import { AttendanceRowQRCode } from './_components/attendance-row-qrcode';
+import { AttendanceLinkQRCode } from './_components/attendance-link-qrcode';
+import { CopyLinkButton } from './_components/copy-link-button';
 import { DeleteAttendanceCallButton } from './_components/delete-attendance-call-button';
 
 export const metadata: Metadata = {
@@ -14,14 +17,17 @@ export const metadata: Metadata = {
 };
 
 export default async function ChamadasPage() {
-  const calls = await prisma.attendanceCall.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      _count: {
-        select: { presences: true },
+  const [calls, baseUrl] = await Promise.all([
+    prisma.attendanceCall.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: { presences: true },
+        },
       },
-    },
-  });
+    }),
+    getBaseUrl(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -32,7 +38,7 @@ export default async function ChamadasPage() {
             Crie chamadas e compartilhe o link ou QR Code para que os alunos registrem presença.
           </p>
         </div>
-        <CreateAttendanceCallDialog />
+        <CreateAttendanceCallDialog baseUrl={baseUrl} />
       </div>
 
       <Card>
@@ -48,37 +54,51 @@ export default async function ChamadasPage() {
               Nenhuma chamada criada ainda.
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Data de Criação</TableHead>
                     <TableHead>Nome da Chamada</TableHead>
                     <TableHead>Presenças</TableHead>
-                    <TableHead className="w-[160px] text-right">Ações</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {calls.map((call) => (
-                    <TableRow key={call.id}>
-                      <TableCell className="whitespace-nowrap">
-                        {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(call.createdAt))}
-                      </TableCell>
-                      <TableCell className="font-medium">{call.name}</TableCell>
-                      <TableCell>{call._count.presences}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-1">
-                          <Link href={`/dashboard/chamadas/${call.id}`}>
-                            <Button variant="ghost" size="icon" title="Ver participantes">
-                              <Users className="w-4 h-4" />
-                            </Button>
-                          </Link>
-                          <AttendanceRowQRCode callId={call.id} callName={call.name} />
-                          <DeleteAttendanceCallButton id={call.id} />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {calls.map((call) => {
+                    const url = `${baseUrl}/presenca/${call.id}`;
+
+                    return (
+                      <TableRow key={call.id}>
+                        <TableCell className="whitespace-nowrap">
+                          {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(call.createdAt))}
+                        </TableCell>
+                        <TableCell className="font-medium">{call.name}</TableCell>
+                        <TableCell>{call._count.presences}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap items-center justify-end gap-2">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Link href={`/dashboard/chamadas/${call.id}`}>
+                                  <Button variant="outline" className="flex items-center gap-2">
+                                    <Users className="w-4 h-4" />
+                                    Participantes
+                                  </Button>
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent>Ver lista de participantes desta chamada</TooltipContent>
+                            </Tooltip>
+                            <AttendanceLinkQRCode
+                              url={url}
+                              fileName={`qrcode-chamada-${call.name.replace(/\s+/g, '-').toLowerCase()}`}
+                            />
+                            <CopyLinkButton url={url} />
+                            <DeleteAttendanceCallButton id={call.id} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>

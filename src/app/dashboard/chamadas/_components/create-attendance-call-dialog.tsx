@@ -16,8 +16,8 @@ import {
 } from '@/src/app/_components/ui/dialog';
 import { Field, FieldGroup, FieldLabel } from '@/src/app/_components/ui/field';
 import { Alert } from '@/src/app/_components/custom/alert';
-import { CheckCircle2, Copy, Download, Plus } from 'lucide-react';
-import { toast } from 'sonner';
+import { CheckCircle2, Download, Plus } from 'lucide-react';
+import { CopyLinkButton } from './copy-link-button';
 
 function CreateCallForm({
   onCreated,
@@ -45,6 +45,7 @@ function CreateCallForm({
             name="name"
             placeholder="Ex: Brigada de Incêndio - Filial SP - 27/09/2026"
             required
+            autoFocus
           />
           {state?.errors?.name && (
             <p className="text-sm text-red-500 mt-1">{state.errors.name[0]}</p>
@@ -61,24 +62,15 @@ function CreateCallForm({
 }
 
 function CreatedCallResult({
-  call,
+  url,
+  callName,
   onDone,
 }: {
-  call: { id: string; name: string };
+  url: string;
+  callName: string;
   onDone: () => void;
 }) {
   const canvasId = useId();
-  const [url, setUrl] = useState('');
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUrl(`${window.location.origin}/presenca/${call.id}`);
-  }, [call.id]);
-
-  const copyLink = async () => {
-    await navigator.clipboard.writeText(url);
-    toast.success('Link copiado!');
-  };
 
   const downloadQRCode = () => {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -86,7 +78,7 @@ function CreatedCallResult({
     const pngUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
     const downloadLink = document.createElement('a');
     downloadLink.href = pngUrl;
-    downloadLink.download = `qrcode-chamada-${call.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+    downloadLink.download = `qrcode-chamada-${callName.replace(/\s+/g, '-').toLowerCase()}.png`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -104,24 +96,20 @@ function CreatedCallResult({
       </div>
 
       <div className="p-4 bg-white rounded-xl shadow-sm border">
-        {url && (
-          <QRCodeCanvas
-            id={canvasId}
-            value={url}
-            size={220}
-            bgColor={'#ffffff'}
-            fgColor={'#000000'}
-            level={'H'}
-            includeMargin={false}
-          />
-        )}
+        <QRCodeCanvas
+          id={canvasId}
+          value={url}
+          size={220}
+          bgColor={'#ffffff'}
+          fgColor={'#000000'}
+          level={'H'}
+          includeMargin={false}
+        />
       </div>
 
       <div className="flex w-full gap-2">
         <Input readOnly value={url} onFocus={(e) => e.target.select()} className="text-center" />
-        <Button type="button" variant="outline" size="icon" onClick={copyLink}>
-          <Copy className="w-4 h-4" />
-        </Button>
+        <CopyLinkButton url={url} variant="outline" size="icon" />
       </div>
 
       <Button onClick={downloadQRCode} className="w-full flex items-center gap-2">
@@ -136,7 +124,11 @@ function CreatedCallResult({
   );
 }
 
-export function CreateAttendanceCallDialog() {
+interface CreateAttendanceCallDialogProps {
+  baseUrl: string;
+}
+
+export function CreateAttendanceCallDialog({ baseUrl }: CreateAttendanceCallDialogProps) {
   const [open, setOpen] = useState(false);
   const [createdCall, setCreatedCall] = useState<{ id: string; name: string } | null>(null);
 
@@ -165,7 +157,11 @@ export function CreateAttendanceCallDialog() {
           </DialogDescription>
         </DialogHeader>
         {createdCall ? (
-          <CreatedCallResult call={createdCall} onDone={() => handleOpenChange(false)} />
+          <CreatedCallResult
+            url={`${baseUrl}/presenca/${createdCall.id}`}
+            callName={createdCall.name}
+            onDone={() => handleOpenChange(false)}
+          />
         ) : (
           <CreateCallForm onCreated={setCreatedCall} />
         )}

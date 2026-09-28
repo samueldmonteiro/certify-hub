@@ -70,8 +70,7 @@ export async function deleteAttendanceCallAction(id: string) {
   }
 }
 
-const attendancePresenceSchema = z.object({
-  callId: z.string().uuid('Chamada inválida'),
+const attendancePresenceFields = {
   course: z.nativeEnum(CertificateType, {
     message: 'Selecione o treinamento',
   }),
@@ -83,6 +82,11 @@ const attendancePresenceSchema = z.object({
     .transform((value) => value.replace(/\D/g, ''))
     .refine((value) => value.length === 11, 'CPF inválido'),
   branchNumber: z.string().min(1, 'Informe o número da filial'),
+};
+
+const attendancePresenceSchema = z.object({
+  callId: z.string().uuid('Chamada inválida'),
+  ...attendancePresenceFields,
 });
 
 export async function createAttendancePresenceAction(
@@ -134,6 +138,82 @@ export async function createAttendancePresenceAction(
     return {
       success: false,
       message: 'Ocorreu um erro ao registrar sua presença. Tente novamente mais tarde.',
+    };
+  }
+}
+
+const attendancePresenceUpdateSchema = z.object({
+  id: z.string().uuid('Registro inválido'),
+  callId: z.string().uuid('Chamada inválida'),
+  ...attendancePresenceFields,
+});
+
+export async function updateAttendancePresenceAction(
+  prevState: any,
+  formData: FormData,
+) {
+  try {
+    const rawData = {
+      id: formData.get('id'),
+      callId: formData.get('callId'),
+      course: formData.get('course'),
+      trainingDate: formData.get('trainingDate'),
+      location: formData.get('location'),
+      studentName: formData.get('studentName'),
+      cpf: formData.get('cpf'),
+      branchNumber: formData.get('branchNumber'),
+    };
+
+    const validatedData = attendancePresenceUpdateSchema.safeParse(rawData);
+
+    if (!validatedData.success) {
+      return {
+        success: false,
+        errors: validatedData.error.flatten().fieldErrors,
+        message: 'Erro de validação. Verifique os campos.',
+      };
+    }
+
+    const { id, callId, ...data } = validatedData.data;
+
+    await prisma.attendancePresence.update({
+      where: { id },
+      data,
+    });
+
+    revalidatePath(`/dashboard/chamadas/${callId}`);
+
+    return {
+      success: true,
+      message: 'Registro atualizado com sucesso!',
+    };
+  } catch (error) {
+    console.error('Attendance presence update error:', error);
+    return {
+      success: false,
+      message: 'Ocorreu um erro ao atualizar o registro.',
+    };
+  }
+}
+
+export async function deleteAttendancePresenceAction(id: string, callId: string) {
+  try {
+    await prisma.attendancePresence.delete({
+      where: { id },
+    });
+
+    revalidatePath(`/dashboard/chamadas/${callId}`);
+    revalidatePath('/dashboard/chamadas');
+
+    return {
+      success: true,
+      message: 'Registro de presença excluído com sucesso!',
+    };
+  } catch (error) {
+    console.error('Attendance presence deletion error:', error);
+    return {
+      success: false,
+      message: 'Ocorreu um erro ao excluir o registro.',
     };
   }
 }

@@ -4,7 +4,7 @@ import { useId } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from '@/src/app/_components/ui/button';
 import { Input } from '@/src/app/_components/ui/input';
-import { Download, QrCode } from 'lucide-react';
+import { Copy, Download, QrCode } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/src/app/_components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/app/_components/ui/tooltip';
+import { toast } from 'sonner';
 
 interface AttendanceLinkQRCodeProps {
   url: string;
@@ -49,20 +51,33 @@ export function AttendanceLinkQRCode({
     document.body.removeChild(downloadLink);
   };
 
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copiado para a área de transferência!');
+    } catch {
+      toast.error('Não foi possível copiar o link.');
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {!hideTrigger && (
-        <DialogTrigger asChild>
-          <Button
-            variant={triggerVariant}
-            size={triggerSize}
-            className="flex items-center gap-2"
-            title="Gerar QR Code"
-          >
-            <QrCode className="w-4 h-4" />
-            {triggerLabel}
-          </Button>
-        </DialogTrigger>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <Button
+                variant={triggerVariant}
+                size={triggerSize}
+                className="flex items-center gap-2"
+              >
+                <QrCode className="w-4 h-4" />
+                {triggerLabel}
+              </Button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Ver e baixar QR Code do formulário</TooltipContent>
+        </Tooltip>
       )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -85,7 +100,12 @@ export function AttendanceLinkQRCode({
               />
             )}
           </div>
-          <Input readOnly value={url} onFocus={(e) => e.target.select()} className="text-center" />
+          <div className="flex w-full gap-2">
+            <Input readOnly value={url} onFocus={(e) => e.target.select()} className="text-center" />
+            <Button type="button" variant="outline" size="icon" onClick={copyLink} title="Copiar link">
+              <Copy className="w-4 h-4" />
+            </Button>
+          </div>
           <Button onClick={downloadQRCode} className="w-full flex items-center gap-2">
             <Download className="w-4 h-4" />
             Baixar QR Code (PNG)

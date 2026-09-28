@@ -2,12 +2,16 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/src/lib/prisma';
+import { getBaseUrl } from '@/src/lib/base-url';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/src/app/_components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/src/app/_components/ui/table';
 import { Badge } from '@/src/app/_components/ui/badge';
 import { ArrowLeft } from 'lucide-react';
 import { CertificateTypeLabels } from '@/src/core/enums/certificate-type.enum';
-import { AttendanceRowQRCode } from '../_components/attendance-row-qrcode';
+import { AttendanceLinkQRCode } from '../_components/attendance-link-qrcode';
+import { CopyLinkButton } from '../_components/copy-link-button';
+import { EditAttendancePresenceDialog } from '../_components/edit-attendance-presence-dialog';
+import { DeleteAttendancePresenceButton } from '../_components/delete-attendance-presence-button';
 
 export const metadata: Metadata = {
   title: 'Detalhes da Chamada | Dashboard',
@@ -24,18 +28,23 @@ function formatCPF(cpf: string) {
 export default async function ChamadaDetailPage({ params }: ChamadaDetailPageProps) {
   const { id } = await params;
 
-  const call = await prisma.attendanceCall.findUnique({
-    where: { id },
-    include: {
-      presences: {
-        orderBy: { createdAt: 'desc' },
+  const [call, baseUrl] = await Promise.all([
+    prisma.attendanceCall.findUnique({
+      where: { id },
+      include: {
+        presences: {
+          orderBy: { createdAt: 'desc' },
+        },
       },
-    },
-  });
+    }),
+    getBaseUrl(),
+  ]);
 
   if (!call) {
     notFound();
   }
+
+  const url = `${baseUrl}/presenca/${call.id}`;
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -50,7 +59,13 @@ export default async function ChamadaDetailPage({ params }: ChamadaDetailPagePro
             {call.presences.length} presença(s) registrada(s).
           </p>
         </div>
-        <AttendanceRowQRCode callId={call.id} callName={call.name} />
+        <div className="flex items-center gap-2">
+          <AttendanceLinkQRCode
+            url={url}
+            fileName={`qrcode-chamada-${call.name.replace(/\s+/g, '-').toLowerCase()}`}
+          />
+          <CopyLinkButton url={url} variant="outline" size="default" label="Copiar Link" />
+        </div>
       </div>
 
       <Card>
@@ -77,6 +92,7 @@ export default async function ChamadaDetailPage({ params }: ChamadaDetailPagePro
                     <TableHead>Treinamento</TableHead>
                     <TableHead>Data do Treinamento</TableHead>
                     <TableHead>Local</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -97,6 +113,12 @@ export default async function ChamadaDetailPage({ params }: ChamadaDetailPagePro
                         {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(new Date(presence.trainingDate))}
                       </TableCell>
                       <TableCell>{presence.location}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          <EditAttendancePresenceDialog presence={presence} />
+                          <DeleteAttendancePresenceButton id={presence.id} callId={call.id} />
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
